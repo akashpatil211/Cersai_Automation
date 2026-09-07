@@ -1,0 +1,13 @@
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+/AllScreenshots/
+/AllScreenshots_EntityDetails/
+/AllScreenshots_PoiDetails/
+/POI 2/
+/POI SS/
