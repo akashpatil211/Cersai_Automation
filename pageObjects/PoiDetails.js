@@ -290,12 +290,44 @@ this.trustDeedRequiredError = page.getByText(
     { exact: true }
 );
 
+this.namesOfAllBeneficiariesTrusteesSettlorAuthors = page.getByLabel(
+    "Names of all beneficiaries, Trustees, Settlor (Protector, if any) and authors of the Trust (list to be enclosed) file"
+);
 
+this.namesOfAllBeneficiariesTrusteesSettlorAuthorsError =
+    page.getByText("Names of all beneficiaries is required", {
+        exact: true
+    });
 
+    this.othersField = page.getByLabel("Others", { exact: true });
 
+this.othersError = page.getByText("Others is required",{ exact: true });
+this.uploadResolutionOfManagingBody = page.getByLabel( "Resolution of Managing Body or Body of Individual of such association file", { exact: true } ); 
+this.resolutionOfManagingBodyError = page.getByText( "Document is required", { exact: true } );
+
+this.uploadPowerOfAttorney = page.getByLabel(
+    "Power of Attorney granted to transact on its behalf file"
+);
+// Page Object
+this.uploadPowerOfAttorney1 = this.page.getByLabel(
+    "Power of attorney granted to its manager, officers or employees to transact on its behalf file",
+    { exact: true }
+);
+
+this.nextSectionHeading = this.page.getByRole(
+    "heading",
+    {
+        name: "Address Details",
+        exact: true
+    }
+)
 
 
 }
+
+
+
+
 
 async navigateToPOI(data) {
 
@@ -323,7 +355,7 @@ async navigateToPOI(data) {
     await this.submitButton.click();
 
     // Hard wait for 1 seconds
-    await this.page.waitForTimeout(1000);
+    await this.page.waitForTimeout(2000);
 
     // Entity Details must load
     await expect(this.entityDetailsHeading).toBeVisible({
@@ -341,7 +373,25 @@ async navigateToPOI(data) {
     await expect(this.poiHeading).toBeVisible({
         timeout: 60000
     });
+
+    this.uploadSupportingDocumentsForPoI = this.page.getByLabel(
+    'Supporting Documents for PoI file',
+    { exact: true }
+);
+
+this.page.getByRole("heading", {
+    name: "Address Details",
+    exact: true
+});
+
 }
+
+async TC_01_VerifyNavigationToProofOfIdentityAndAddress(data) {
+    await this.navigateToPOI(data);
+
+    await expect(this.poiHeading).toBeVisible();
+}
+
 async TC_02_POI_VerifyAllFields(data) {
 
     // Common navigation to POI page
@@ -5780,61 +5830,90 @@ async TC_112_VerifyPartnershipDeedAcceptsPDFJPGJPEGLessThan25MB(data) {
     await expect(this.fileFormatError).not.toBeVisible();
 }
 
-async TC_113_VerifyPartnershipDeedRejectsInvalidFileGreaterThan25MB(data) {
+async TC_113_VerifyPartnershipDeedRejectsOtherFormatGreaterThan25MB(data) {
 
     await this.navigateToPOI(data);
 
     const path = require("path");
-    const fs = require("fs");
 
-    // Read invalid file name from Excel
-    const pdfFileName = String(
-        data.partnershipDeedPdfPath ?? ""
-    ).trim();
-
-    // Verify Excel value is not empty
-    expect(pdfFileName).not.toBe("");
-
-    // Build file path
-    const pdfPath = path.join(
+    const otherFilePath = path.join(
         "D:/DSC",
-        pdfFileName
+        String(data.partnershipDeedOtherPath ?? "").trim()
     );
 
-    // Verify file exists
-    expect(
-        fs.existsSync(pdfPath),
-        `File not found: ${pdfPath}`
-    ).toBe(true);
+    // Upload file other than PDF/JPG/JPEG and greater than 25 MB
+    await this.uploadPartnershipDeed.setInputFiles(otherFilePath);
 
-    // Maximum allowed size = 25 MB
-    const maxSize = 25 * 1024 * 1024; // 26,214,400 bytes
+    // Verify file is rejected
+    await expect(this.fileFormatError).toBeVisible();
 
-    // Verify file is greater than 25 MB
-    expect(
-        fs.statSync(pdfPath).size,
-        `File size should be greater than 25 MB: ${pdfPath}`
-    ).toBeGreaterThan(maxSize);
-
-    // Verify file extension is NOT PDF/JPG/JPEG
-    expect(
-        path.extname(pdfPath).toLowerCase()
-    ).not.toMatch(/\.(pdf|jpg|jpeg)$/);
-
-    // Upload invalid file
-    await this.uploadPartnershipDeed.setInputFiles(pdfPath);
-
-    // Verify format validation error
-    await expect(
-        this.fileFormatError
-    ).toBeVisible();
-
-    await expect(
-        this.fileFormatError
-    ).toHaveText(
-        "Only PDF, JPG or JPEG files are alZlowed"
-    );
+    // Clear uploaded file
+    await this.uploadPartnershipDeed.setInputFiles([]);
 }
+
+async TC_114_VerifyPartnershipDeedRejectsOtherFormatEqualTo25MB(data) {
+
+    await this.navigateToPOI(data);
+
+    const path = require("path");
+
+    const otherFilePath = path.join(
+        "D:/DSC",
+        String(data.partnershipDeedOtherPath ?? "").trim()
+    );
+
+    // Upload file other than PDF/JPG/JPEG and greater than 25 MB
+    await this.uploadPartnershipDeed.setInputFiles(otherFilePath);
+
+    // Verify file is rejected
+    await expect(this.fileFormatError).toBeVisible();
+
+    // Clear uploaded file
+    await this.uploadPartnershipDeed.setInputFiles([]);
+}
+
+async TC_115_VerifyPartnershipDeedRejectsOtherFormatLessThan25MB(data) {
+
+    await this.navigateToPOI(data);
+
+    const path = require("path");
+
+    const otherFilePath = path.join(
+        "D:/DSC",
+        String(data.partnershipDeedOtherPath ?? "").trim()
+    );
+
+    // Upload file other than PDF/JPG/JPEG and greater than 25 MB
+    await this.uploadPartnershipDeed.setInputFiles(otherFilePath);
+
+    // Verify file is rejected
+    await expect(this.fileFormatError).toBeVisible();
+
+    // Clear uploaded file
+    await this.uploadPartnershipDeed.setInputFiles([]);
+}
+
+async TC_116_VerifyPartnershipDeedRejectsOtherFormatGreaterThan25MB(data) {
+
+    await this.navigateToPOI(data);
+
+    const path = require("path");
+
+    const otherFilePath = path.join(
+        "D:/DSC",
+        String(data.partnershipDeedOtherPath ?? "").trim()
+    );
+
+    // Upload file other than PDF/JPG/JPEG and greater than 25 MB
+    await this.uploadPartnershipDeed.setInputFiles(otherFilePath);
+
+    // Verify file is rejected
+    await expect(this.fileFormatError).toBeVisible();
+
+    // Clear uploaded file
+    await this.uploadPartnershipDeed.setInputFiles([]);
+}
+
 
 async TC_117_VerifyNamesOfAllPartnersMandatoryForPartnershipFirm(data) {
 
@@ -7198,5 +7277,2812 @@ async TC_158_VerifyTrustDeedRejectsMultipleFilesGreaterThan25MB(data) {
     await this.uploadTrustDeed.setInputFiles(jpegFilePath);
     await expect(this.fileSizeError).toBeVisible();
 }
+
+async TC_159_VerifyTrustDeedRejectsInvalidFormatFileEqualTo25MB(data) {
+    await this.navigateToPOI(data);
+
+    const path = require("path");
+
+    // Take invalid file path from Excel
+    const invalidFileName = String(
+        data.trustDeedInvalidPath ?? ""
+    ).trim();
+
+    const invalidFilePath = path.join(
+        "D:/DSC",
+        invalidFileName
+    );
+
+    // Upload invalid format file (exactly 25 MB)
+    await this.uploadTrustDeed.setInputFiles(invalidFilePath);
+
+    // Verify invalid format error
+    await expect(this.fileFormatError).toBeVisible({
+        timeout: 5000
+    });
+}
+
+async TC_160_VerifyTrustDeedRejectsMultipleInvalidFormatFilesLessThan25MB(data) {
+    await this.navigateToPOI(data);
+
+    const path = require("path");
+
+    // Take invalid file path from Excel
+    const invalidFileName = String(
+        data.trustDeedInvalidPath ?? ""
+    ).trim();
+
+    const invalidFilePath = path.join(
+        "D:/DSC",
+        invalidFileName
+    );
+
+    // Upload invalid format file - less than 25 MB
+    await this.uploadTrustDeed.setInputFiles(invalidFilePath);
+
+    // Verify invalid format error
+    await expect(this.fileFormatError).toBeVisible({
+        timeout: 5000
+    });
+
+    // Clear uploaded file
+    await this.uploadTrustDeed.setInputFiles([]);
+
+    // Upload the same invalid format file again
+    await this.uploadTrustDeed.setInputFiles(invalidFilePath);
+
+    // Verify invalid format error again
+    await expect(this.fileFormatError).toBeVisible({
+        timeout: 5000
+    });
+}
+
+async TC_161_VerifyTrustDeedRejectsInvalidFormatFileGreaterThan25MB(data) {
+    await this.navigateToPOI(data);
+
+    const path = require("path");
+
+    // Take invalid file path from Excel
+    const invalidFileName = String(
+        data.trustDeedInvalidPath ?? ""
+    ).trim();
+
+    const invalidFilePath = path.join(
+        "D:/DSC",
+        invalidFileName
+    );
+
+    // Upload invalid format file (>25 MB)
+    await this.uploadTrustDeed.setInputFiles(invalidFilePath);
+
+    // Verify invalid format error
+    await expect(this.fileFormatError).toBeVisible({
+        timeout: 5000
+    });
+}
+
+async TC_162_VerifyNamesOfBeneficiariesTrusteesSettlorAuthorsFieldIsMandatoryForRegisteredTrust(data) {
+
+    await this.navigateToPOI(data);
+
+
+
+    // Ensure file upload field is empty
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors.setInputFiles([]);
+
+    // Click Save & Next without uploading the mandatory document
+    await this.saveAndNextButton.click();
+
+    // Verify mandatory validation message
+    await expect(
+        this.namesOfAllBeneficiariesTrusteesSettlorAuthorsError
+    ).toBeVisible({ timeout: 5000 });
+
+    await expect(
+        this.namesOfAllBeneficiariesTrusteesSettlorAuthorsError
+    ).toHaveText("Names of all beneficiaries is required");
+}
+
+async TC_163_VerifyNamesOfBeneficiariesTrusteesSettlorAuthorsAcceptsOnlyPDFJPGJPEG(data) {
+
+    await this.navigateToPOI(data);
+
+    const path = require("path");
+
+    const pdfFilePath = path.join(
+        "D:/DSC",
+        String(data.namesBeneficiariesPdfPath).trim()
+    );
+
+    const jpgFilePath = path.join(
+        "D:/DSC",
+        String(data.namesBeneficiariesJpgPath).trim()
+    );
+
+    const jpegFilePath = path.join(
+        "D:/DSC",
+        String(data.namesBeneficiariesJpegPath).trim()
+    );
+
+    // PDF
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles(pdfFilePath);
+
+    await expect(this.fileFormatError).not.toBeVisible();
+
+    // Clear uploaded file
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles([]);
+
+    // JPG
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles(jpgFilePath);
+
+    await expect(this.fileFormatError).not.toBeVisible();
+
+    // Clear uploaded file
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles([]);
+
+    // JPEG
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles(jpegFilePath);
+
+    await expect(this.fileFormatError).not.toBeVisible();
+}
+
+async TC_164_VerifyNamesOfBeneficiariesTrusteesSettlorAuthorsAcceptsMaximum25MBAcrossAllFormats(data) {
+
+    await this.navigateToPOI(data);
+
+    const path = require("path");
+
+    const pdfFilePath = path.join(
+        "D:/DSC",
+        String(data.namesBeneficiariesPdfPath).trim()
+    );
+
+    const jpgFilePath = path.join(
+        "D:/DSC",
+        String(data.namesBeneficiariesJpgPath).trim()
+    );
+
+    const jpegFilePath = path.join(
+        "D:/DSC",
+        String(data.namesBeneficiariesJpegPath).trim()
+    );
+
+    // PDF - exactly 25 MB or less
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles(pdfFilePath);
+
+    await expect(this.fileSizeError).not.toBeVisible();
+
+    // Clear uploaded file
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles([]);
+
+    // JPG - exactly 25 MB or less
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles(jpgFilePath);
+
+    await expect(this.fileSizeError).not.toBeVisible();
+
+    // Clear uploaded file
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles([]);
+
+    // JPEG - exactly 25 MB or less
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles(jpegFilePath);
+
+    await expect(this.fileSizeError).not.toBeVisible();
+}
+
+async TC_165_VerifyNamesOfBeneficiariesTrusteesSettlorAuthorsRejectsFilesGreaterThan25MB(data) {
+
+    await this.navigateToPOI(data);
+
+    const path = require("path");
+
+    const pdfFilePath = path.join(
+        "D:/DSC",
+        String(data.namesBeneficiariesPdfPath).trim()
+    );
+
+    const jpgFilePath = path.join(
+        "D:/DSC",
+        String(data.namesBeneficiariesJpgPath).trim()
+    );
+
+    const jpegFilePath = path.join(
+        "D:/DSC",
+        String(data.namesBeneficiariesJpegPath).trim()
+    );
+
+    // PDF greater than 25 MB
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles(pdfFilePath);
+
+    await expect(this.fileSizeError).toBeVisible();
+
+
+    // Clear uploaded file
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles([]);
+
+    // JPG greater than 25 MB
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles(jpgFilePath);
+
+    await expect(this.fileSizeError).toBeVisible();
+
+
+    // Clear uploaded file
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles([]);
+
+    // JPEG greater than 25 MB
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles(jpegFilePath);
+
+    await expect(this.fileSizeError).toBeVisible();
+}
+
+async TC_166_VerifyNamesBeneficiariesAcceptsPDFJPGJPEGEqualTo25MB(data) {
+
+    await this.navigateToPOI(data);
+
+    const fs = require("fs");
+    const path = require("path");
+
+    const maxSize = 25 * 1024 * 1024; // 25 MB
+
+    // Take file names from Excel and build complete paths
+    const pdfPath = path.join(
+        "D:/DSC",
+        String(data.namesBeneficiariesPdfPath ?? "").trim()
+    );
+
+    const jpgPath = path.join(
+        "D:/DSC",
+        String(data.namesBeneficiariesJpgPath ?? "").trim()
+    );
+
+    const jpegPath = path.join(
+        "D:/DSC",
+        String(data.namesBeneficiariesJpegPath ?? "").trim()
+    );
+
+    // Verify Excel values are available
+    expect(String(data.namesBeneficiariesPdfPath ?? "").trim()).not.toBe("");
+    expect(String(data.namesBeneficiariesJpgPath ?? "").trim()).not.toBe("");
+    expect(String(data.namesBeneficiariesJpegPath ?? "").trim()).not.toBe("");
+
+
+    // JPG - exactly 25 MB
+    expect(fs.statSync(jpgPath).size).toBe(maxSize);
+
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles(jpgPath);
+
+    await expect(this.fileSizeError).not.toBeVisible();
+
+    // Clear uploaded file
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles([]);
+
+    // JPEG - exactly 25 MB
+    expect(fs.statSync(jpegPath).size).toBe(maxSize);
+
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles(jpegPath);
+
+    await expect(this.fileSizeError).not.toBeVisible();
+
+    // PDF - exactly 25 MB
+    expect(fs.statSync(pdfPath).size).toBe(maxSize);
+
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles(pdfPath);
+
+    await expect(this.fileSizeError).not.toBeVisible();
+
+}
+
+async TC_167_VerifyNamesBeneficiariesAcceptsMultipleSameFormatFilesLessThan25MB(data) {
+
+    await this.navigateToPOI(data);
+
+    const fs = require("fs");
+    const path = require("path");
+
+    const maxSize = 25 * 1024 * 1024; // 25 MB
+
+    // Read file names from Excel and build full paths
+    const pdfPath = path.join(
+        "D:/DSC",
+        String(data.namesBeneficiariesPdfPath ?? "").trim()
+    );
+
+    const jpgPath = path.join(
+        "D:/DSC",
+        String(data.namesBeneficiariesJpgPath ?? "").trim()
+    );
+
+    const jpegPath = path.join(
+        "D:/DSC",
+        String(data.namesBeneficiariesJpegPath ?? "").trim()
+    );
+
+    // Verify PDF file is less than 25 MB
+    expect(fs.statSync(pdfPath).size).toBeLessThan(maxSize);
+
+    // Upload PDF
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles(pdfPath);
+
+    await expect(this.fileSizeError).not.toBeVisible();
+
+    // Clear uploaded file
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles([]);
+
+    // Upload another PDF file if available
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles(pdfPath);
+
+    await expect(this.fileSizeError).not.toBeVisible();
+
+    // Clear uploaded file
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles([]);
+
+    // Verify JPG file is less than 25 MB
+    expect(fs.statSync(jpgPath).size).toBeLessThan(maxSize);
+
+    // Upload JPG
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles(jpgPath);
+
+    await expect(this.fileSizeError).not.toBeVisible();
+
+    // Clear uploaded file
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles([]);
+
+    // Upload another JPG file
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles(jpgPath);
+
+    await expect(this.fileSizeError).not.toBeVisible();
+
+    // Clear uploaded file
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles([]);
+
+    // Verify JPEG file is less than 25 MB
+    expect(fs.statSync(jpegPath).size).toBeLessThan(maxSize);
+
+    // Upload JPEG
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles(jpegPath);
+
+    await expect(this.fileSizeError).not.toBeVisible();
+
+    // Clear uploaded file
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles([]);
+
+    // Upload another JPEG file
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles(jpegPath);
+
+    await expect(this.fileSizeError).not.toBeVisible();
+}
+
+async TC_168_VerifyNamesBeneficiariesRejectsMultipleSameFormatFilesGreaterThan25MB(data) {
+
+    await this.navigateToPOI(data);
+
+    const fs = require("fs");
+    const path = require("path");
+
+    const maxSize = 25 * 1024 * 1024; // 25 MB
+
+    // Read file names from Excel
+    const pdfPath = path.join(
+        "D:/DSC",
+        String(data.namesBeneficiariesPdfPath ?? "").trim()
+    );
+
+    const jpgPath = path.join(
+        "D:/DSC",
+        String(data.namesBeneficiariesJpgPath ?? "").trim()
+    );
+
+    const jpegPath = path.join(
+        "D:/DSC",
+        String(data.namesBeneficiariesJpegPath ?? "").trim()
+    );
+
+    
+
+    // ---------------------------------------------------------
+    // JPG - Greater than 25 MB
+    // ---------------------------------------------------------
+    expect(fs.statSync(jpgPath).size).toBeGreaterThan(maxSize);
+
+    // Upload first JPG
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles(jpgPath);
+
+    await expect(this.fileSizeError).toBeVisible();
+
+    // Clear file
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles([]);
+
+    // Upload second JPG
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles(jpgPath);
+
+    await expect(this.fileSizeError).toBeVisible();
+
+    // Clear file
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles([]);
+
+    // ---------------------------------------------------------
+    // JPEG - Greater than 25 MB
+    // ---------------------------------------------------------
+    expect(fs.statSync(jpegPath).size).toBeGreaterThan(maxSize);
+
+    // Upload first JPEG
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles(jpegPath);
+
+    await expect(this.fileSizeError).toBeVisible();
+
+    // Clear file
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles([]);
+
+    // Upload second JPEG
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles(jpegPath);
+
+    await expect(this.fileSizeError).toBeVisible();
+
+    // Clear file
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles([]);
+
+        // ---------------------------------------------------------
+    // PDF - Greater than 25 MB
+    // ---------------------------------------------------------
+    expect(fs.statSync(pdfPath).size).toBeGreaterThan(maxSize);
+
+    // Upload first PDF
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles(pdfPath);
+
+    await expect(this.fileSizeError).toBeVisible();
+
+    // Clear file
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles([]);
+
+    // Upload second PDF
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles(pdfPath);
+
+    await expect(this.fileSizeError).toBeVisible();
+
+    // Clear file
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles([]);
+}
+
+async TC_169_VerifyNamesBeneficiariesRejectsMultipleInvalidFormatFilesEqualTo25MB(data) {
+
+    await this.navigateToPOI(data);
+
+    const fs = require("fs");
+    const path = require("path");
+
+    const maxSize = 25 * 1024 * 1024; // 25 MB
+
+    // Take only one invalid file from Excel
+    const invalidFilePath = path.join(
+        "D:/DSC",
+        String(data.namesBeneficiariesInvalidFilePath).trim()
+    );
+
+    // Verify file size is exactly 25 MB
+    expect(fs.statSync(invalidFilePath).size).toBe(maxSize);
+
+    // First upload
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles(invalidFilePath);
+
+    await expect(this.fileFormatError).toBeVisible();
+
+    // Clear file
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles([]);
+
+    // Second upload of the same invalid-format file
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles(invalidFilePath);
+
+    await expect(this.fileFormatError).toBeVisible();
+
+    // Clear file
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles([]);
+}
+
+async TC_170_VerifyNamesBeneficiariesRejectsMultipleInvalidFormatFilesLessThan25MB(data) {
+
+    await this.navigateToPOI(data);
+
+    const fs = require("fs");
+    const path = require("path");
+
+    const maxSize = 25 * 1024 * 1024; // 25 MB
+
+    // Take one invalid-format file from Excel
+    const invalidFilePath = path.join(
+        "D:/DSC",
+        String(data.namesBeneficiariesInvalidFilePath).trim()
+    );
+
+    // Verify file size is less than 25 MB
+    expect(fs.statSync(invalidFilePath).size).toBeLessThan(maxSize);
+
+    // First upload
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles(invalidFilePath);
+
+    // Verify invalid format error
+    await expect(this.fileFormatError).toBeVisible();
+
+    // Clear file
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles([]);
+
+    // Second upload of the same invalid-format file
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles(invalidFilePath);
+
+    // Verify invalid format error again
+    await expect(this.fileFormatError).toBeVisible();
+
+    // Clear file
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles([]);
+}
+
+async TC_171_VerifyNamesBeneficiariesRejectsMultipleInvalidFormatFilesGreaterThan25MB(data) {
+
+    await this.navigateToPOI(data);
+
+    const fs = require("fs");
+    const path = require("path");
+
+    const maxSize = 25 * 1024 * 1024; // 25 MB
+
+    // Take one invalid-format file from Excel
+    const invalidFilePath = path.join(
+        "D:/DSC",
+        String(data.namesBeneficiariesInvalidFilePath).trim()
+    );
+
+    // Verify file size is greater than 25 MB
+    expect(fs.statSync(invalidFilePath).size).toBeGreaterThan(maxSize);
+
+    // First upload
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles(invalidFilePath);
+
+    // Verify invalid format error
+    await expect(this.fileFormatError).toBeVisible();
+
+    // Clear file
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles([]);
+
+    // Second upload of the same invalid-format file
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles(invalidFilePath);
+
+    // Verify invalid format error again
+    await expect(this.fileFormatError).toBeVisible();
+
+    // Clear file
+    await this.namesOfAllBeneficiariesTrusteesSettlorAuthors
+        .setInputFiles([]);
+}
+
+
+
+async TC_172_VerifyOthersFieldIsNonMandatoryForTrust(data) {
+
+    await this.navigateToPOI(data);
+
+    // Leave Others file field empty
+    await this.uploadOthers.setInputFiles([]);
+
+    // Click Save and Next
+    await this.saveAndNextButton.click();
+
+}
+
+async TC_173_VerifyOthersFieldRejectOtherThanPDFJPGJPEG(data) {
+
+    await this.navigateToPOI(data);
+
+    const invalidFilePath = path.join(
+        "D:/DSC",
+        String(data.othersFormatPath).trim()
+    );
+
+    await this.uploadOthers.setInputFiles(invalidFilePath);
+
+    await expect(this.fileFormatError).toBeVisible();
+}
+
+
+async TC_174_VerifyOthersFieldAccepts25MBAllFormats(data) {
+
+    await this.navigateToPOI(data);
+
+    const fs = require("fs");
+    const path = require("path");
+
+    const maxSize = 25 * 1024 * 1024; // 25 MB = 26214400 bytes
+
+    const files = [
+       
+        {
+            name: "JPG",path: path.join("D:/DSC",String(data.othersJpgPath).trim())
+        },
+        {
+          name: "JPEG",path: path.join("D:/DSC",String(data.othersJpegPath).trim()
+            )
+        },
+         {
+            name: "PDF",
+            path: path.join("D:/DSC",String(data.othersPdfPath).trim()
+            )
+        }
+    ];
+
+    for (const file of files) {
+
+        // Verify file is exactly 25 MB
+        expect(fs.statSync(file.path).size).toBe(maxSize);
+
+        // Upload one file
+        await this.uploadOthers.setInputFiles(file.path);
+
+        // 25 MB file should not show size validation error
+        await expect(this.fileSizeError).not.toBeVisible();
+
+        // Clear before uploading next format
+        await this.uploadOthers.setInputFiles([]);
+    }
+}
+
+
+async TC_175_VerifyOthersFieldRejectsMoreThan25MB(data) {
+
+    await this.navigateToPOI(data);
+
+    const fs = require("fs");
+    const path = require("path");
+
+    const maxSize = 25 * 1024 * 1024;
+
+    const filePath = path.join(
+        "D:/DSC",
+        String(data.othersPdfPath).trim()
+    );
+
+    expect(fs.statSync(filePath).size).toBeGreaterThan(maxSize);
+
+    await this.uploadOthers.setInputFiles(filePath);
+
+    await expect(this.fileSizeError).toBeVisible();
+}
+
+
+async TC_176_VerifyOthersFieldForTrustAccepts25MBJPEG(data) {
+    await this.navigateToPOI(data);
+
+    const filePath = path.join("D:/DSC", String(data.othersJpegPath).trim());
+
+    await this.uploadOthers.setInputFiles(filePath);
+
+    await expect(this.fileSizeError).not.toBeVisible();
+}
+
+
+async TC_177_VerifyOthersFieldForTrustAcceptsJPEGLessThan25MB(data) {
+    await this.navigateToPOI(data);
+
+    const fs = require("fs");
+    const path = require("path");
+
+    const maxSize = 25 * 1024 * 1024;
+
+    const filePath = path.join(
+        "D:/DSC",
+        String(data.othersJpegPath).trim()
+    );
+
+    // Verify JPEG file size is less than 25 MB
+    expect(fs.statSync(filePath).size).toBeLessThan(maxSize);
+
+    // Upload JPEG file
+    await this.uploadOthers.setInputFiles(filePath);
+
+    // Verify no file size validation error is displayed
+    await expect(this.fileSizeError).not.toBeVisible();
+}
+
+
+async TC_178_VerifyOthersFieldForTrustRejectsJPEGGreaterThan25MB(data) {
+    await this.navigateToPOI(data);
+
+    const fs = require("fs");
+    const path = require("path");
+
+    const maxSize = 25 * 1024 * 1024;
+
+    const filePath = path.join(
+        "D:/DSC",
+        String(data.othersJpegPath).trim()
+    );
+
+    // Verify JPEG file size is greater than 25 MB
+    expect(fs.statSync(filePath).size).toBeGreaterThan(maxSize);
+
+    // Upload JPEG file
+    await this.uploadOthers.setInputFiles(filePath);
+
+    // Verify file size validation error is displayed
+    await expect(this.fileSizeError).toBeVisible();
+}
+
+async TC_179_VerifyOthersFieldForTrustAcceptsJPGEqualTo25MB(data) {
+    await this.navigateToPOI(data);
+
+    const fs = require("fs");
+    const path = require("path");
+
+    const maxSize = 25 * 1024 * 1024; // 25 MB = 26214400 bytes
+
+    const filePath = path.join(
+        "D:/DSC",
+        String(data.othersJpgPath).trim()
+    );
+
+    // Verify JPG file size is exactly 25 MB
+    expect(fs.statSync(filePath).size).toBe(maxSize);
+
+    // Upload JPG file
+    await this.uploadOthers.setInputFiles(filePath);
+
+    // Verify file size error is not displayed
+    await expect(this.fileSizeError).not.toBeVisible();
+}
+
+
+async TC_180_VerifyOthersFieldForTrustAcceptsJPGLessThan25MB(data) {
+    await this.navigateToPOI(data);
+
+    const fs = require("fs");
+    const path = require("path");
+
+    const maxSize = 25 * 1024 * 1024; // 25 MB = 26214400 bytes
+
+    const filePath = path.join(
+        "D:/DSC",
+        String(data.othersJpgPath).trim()
+    );
+
+    // Verify JPG file size is less than 25 MB
+    expect(fs.statSync(filePath).size).toBeLessThan(maxSize);
+
+    // Upload JPG file
+    await this.uploadOthers.setInputFiles(filePath);
+
+    // Verify file size error is not displayed
+    await expect(this.fileSizeError).not.toBeVisible();
+}
+
+async TC_181_VerifyOthersFieldForTrustRejectsJPGGreaterThan25MB(data) {
+    await this.navigateToPOI(data);
+
+    const fs = require("fs");
+    const path = require("path");
+
+    const maxSize = 25 * 1024 * 1024; // 25 MB = 26214400 bytes
+
+    const filePath = path.join(
+        "D:/DSC",
+        String(data.othersJpgPath).trim()
+    );
+
+    // Verify JPG file size is greater than 25 MB
+    expect(fs.statSync(filePath).size).toBeGreaterThan(maxSize);
+
+    // Upload JPG file
+    await this.uploadOthers.setInputFiles(filePath);
+
+    // Verify file size error is displayed
+    await expect(this.fileSizeError).toBeVisible();
+}
+
+async TC_182_VerifyResolutionOfManagingBodyFieldIsMandatory(data) {
+    await this.navigateToPOI(data);
+
+    // Click Save and Next
+    await this.saveAndNextButton.click();
+
+    // Verify mandatory validation error
+    await expect(this.resolutionOfManagingBodyError).toBeVisible();
+}
+
+
+async TC_183_VerifyResolutionOfManagingBodyRejectsInvalidFormat(data) {
+    await this.navigateToPOI(data);
+
+    const path = require("path");
+
+    const invalidFilePath = path.join(
+        "D:/DSC",
+        String(data.resolutionOfManagingBodyPath).trim()
+    );
+
+    await this.uploadResolutionOfManagingBody.setInputFiles(invalidFilePath);
+
+    await expect(this.fileFormatError).toBeVisible();
+}
+
+async TC_184_VerifyResolutionOfManagingBodyAcceptsMaximum25MB(data) {
+await this.navigateToPOI(data);
+
+const fs = require("fs");
+const path = require("path");
+
+const maxSize = 25 * 1024 * 1024; // 25 MB = 26214400 bytes
+
+const files = [
+    path.join("D:/DSC", String(data.resolutionOfManagingBodypdfPath).trim()),
+    path.join("D:/DSC", String(data.resolutionOfManagingBodyjpgPath).trim()),
+    path.join("D:/DSC", String(data.resolutionOfManagingBodypegPath).trim())
+];
+
+for (const filePath of files) {
+    // Verify file size is exactly 25 MB
+    expect(fs.statSync(filePath).size).toBe(maxSize);
+
+    // Upload file
+    await this.uploadResolutionOfManagingBody.setInputFiles(filePath);
+
+    // Verify 25 MB file is accepted
+    await expect(this.fileSizeError).not.toBeVisible();
+
+    // Clear file before next upload
+    await this.uploadResolutionOfManagingBody.setInputFiles([]);
+}
+
+
+}
+
+async TC_185_VerifyResolutionOfManagingBodyRejectsMoreThan25MB(data) {
+    await this.navigateToPOI(data);
+
+    const fs = require("fs");
+    const path = require("path");
+
+    const maxSize = 25 * 1024 * 1024;
+
+    const pdfPath = path.join(
+        "D:/DSC",
+        String(data.resolutionOfManagingBodypdfPath).trim()
+    );
+
+    expect(fs.statSync(pdfPath).size).toBeGreaterThan(maxSize);
+
+    await this.uploadResolutionOfManagingBody.setInputFiles(pdfPath);
+
+    await expect(this.fileSizeError).toBeVisible();
+
+    await this.uploadResolutionOfManagingBody.setInputFiles([]);
+}
+
+
+async TC_186_VerifyResolutionOfManagingBodyAccepts25MBPDF(data) {
+    await this.navigateToPOI(data);
+
+    const fs = require("fs");
+    const path = require("path");
+
+    const pdfPath = path.join(
+        "D:/DSC",
+        String(data.resolutionOfManagingBodypdfPath ?? "").trim()
+    );
+
+    // Verify file exists
+    expect(fs.existsSync(pdfPath)).toBeTruthy();
+
+    // Exactly 25 MB
+    const maxSize = 25 * 1024 * 1024;
+
+    const fileSize = fs.statSync(pdfPath).size;
+    expect(fileSize).toBe(maxSize);
+
+    // Upload PDF
+    await this.uploadResolutionOfManagingBody.setInputFiles(pdfPath);
+
+    // 25 MB should be accepted
+    await expect(this.fileSizeError).not.toBeVisible();
+
+    // PDF format should be accepted
+    await expect(this.fileFormatError).not.toBeVisible();
+}
+
+async TC_187_VerifyResolutionOfManagingBodyAcceptsPDFLessThan25MB(data) {
+    await this.navigateToPOI(data);
+
+    const fs = require("fs");
+    const path = require("path");
+
+    const maxSize = 25 * 1024 * 1024;
+
+    // Read PDF filename from Excel
+    const pdfPath = path.join(
+        "D:/DSC",
+        String(data.resolutionOfManagingBodypdfPath ?? "").trim()
+    );
+
+    // Verify Excel value is available
+    expect(String(data.resolutionOfManagingBodypdfPath ?? "").trim())
+        .not.toBe("");
+
+    // Verify file exists
+    expect(fs.existsSync(pdfPath)).toBeTruthy();
+
+    // Verify file size is less than 25 MB
+    const fileSize = fs.statSync(pdfPath).size;
+    expect(fileSize).toBeLessThan(maxSize);
+
+    // Upload PDF
+    await this.uploadResolutionOfManagingBody.setInputFiles(pdfPath);
+
+    // Verify no size validation error
+    await expect(this.fileSizeError).not.toBeVisible();
+    await expect(this.fileSizeError1).not.toBeVisible();
+
+    // Verify PDF format is accepted
+    await expect(this.fileFormatError).not.toBeVisible();
+}
+
+async TC_188_VerifyResolutionOfManagingBodyRejectsJPGAndJPEGGreaterThan25MB(data) {
+    await this.navigateToPOI(data);
+
+    const fs = require("fs");
+    const path = require("path");
+
+    const maxSize = 25 * 1024 * 1024;
+
+    const files = [
+        path.join("D:/DSC",String(data.resolutionOfManagingBodyjpgPath ?? "").trim()),
+        path.join(
+            "D:/DSC",
+            String(data.resolutionOfManagingBodyjpegPath ?? "").trim()
+        )
+    ];
+
+    for (const filePath of files) {
+        expect(fs.existsSync(filePath)).toBeTruthy();
+
+        const fileSize = fs.statSync(filePath).size;
+
+        // Verify file size is greater than 25 MB
+        expect(fileSize).toBeGreaterThan(maxSize);
+
+        // Upload JPG/JPEG file
+        await this.uploadResolutionOfManagingBody.setInputFiles(filePath);
+
+        // Verify 25 MB validation message
+        await expect(this.fileSizeError).toBeVisible();
+
+        // Clear uploaded file before next upload
+        await this.uploadResolutionOfManagingBody.setInputFiles([]);
+    }
+}
+
+async TC_189_VerifyResolutionOfManagingBodyRejectsInvalidFormatsEqualTo25MB(data) {
+    await this.navigateToPOI(data);
+
+    const fs = require("fs");
+    const path = require("path");
+
+    const maxSize = 25 * 1024 * 1024;
+
+    const invalidFilePath = path.join(
+        "D:/DSC",
+        String(data.resolutionOfManagingBodyPath ?? "").trim()
+    );
+
+    // Verify file exists
+    expect(fs.existsSync(invalidFilePath)).toBeTruthy();
+
+    // Verify file size is exactly 25 MB
+    const fileSize = fs.statSync(invalidFilePath).size;
+    expect(fileSize).toBe(maxSize);
+
+    // Upload invalid format file
+    await this.uploadResolutionOfManagingBody.setInputFiles(
+        invalidFilePath
+    );
+
+    // Verify invalid format error
+    await expect(this.fileFormatError).toBeVisible();
+
+    // Clear uploaded file
+    await this.uploadResolutionOfManagingBody.setInputFiles([]);
+}
+
+async TC_190_VerifyResolutionOfManagingBodyRejectsInvalidFormatsLessThan25MB(data) {
+    await this.navigateToPOI(data);
+
+    const fs = require("fs");
+    const path = require("path");
+
+    const maxSize = 25 * 1024 * 1024;
+
+    const invalidFilePath = path.join(
+        "D:/DSC",
+        String(data.resolutionOfManagingBodyPath ?? "").trim()
+    );
+
+    // Verify file exists
+    expect(fs.existsSync(invalidFilePath)).toBeTruthy();
+
+    // Verify file size is less than 25 MB
+    const fileSize = fs.statSync(invalidFilePath).size;
+    expect(fileSize).toBeLessThan(maxSize);
+
+    // Upload invalid format file
+    await this.uploadResolutionOfManagingBody.setInputFiles(
+        invalidFilePath
+    );
+
+    // Verify invalid format error
+    await expect(this.fileFormatError).toBeVisible();
+
+    // Clear uploaded file
+    await this.uploadResolutionOfManagingBody.setInputFiles([]);
+}
+
+async TC_191_VerifyResolutionOfManagingBodyRejectsInvalidFormatsGreaterThan25MB(data) {
+    await this.navigateToPOI(data);
+
+    const fs = require("fs");
+    const path = require("path");
+
+    const maxSize = 25 * 1024 * 1024;
+
+    const invalidFilePath = path.join(
+        "D:/DSC",
+        String(data.resolutionOfManagingBodyPath ?? "").trim()
+    );
+
+    // Verify file exists
+    expect(fs.existsSync(invalidFilePath)).toBeTruthy();
+
+    // Verify file size is greater than 25 MB
+    const fileSize = fs.statSync(invalidFilePath).size;
+    expect(fileSize).toBeGreaterThan(maxSize);
+
+    // Upload invalid format file
+    await this.uploadResolutionOfManagingBody.setInputFiles(
+        invalidFilePath
+    );
+
+    // Verify invalid format error
+    await expect(this.fileFormatError).toBeVisible();
+
+    // Clear uploaded file
+    await this.uploadResolutionOfManagingBody.setInputFiles([]);
+}
+
+async TC_192_VerifyPowerOfAttorneyFieldIsMandatory(data) {
+    await this.navigateToPOI(data);
+
+    // Do not upload any file
+
+    // Click Save and Next
+    await this.saveAndNextButton.click();
+
+    // Verify mandatory field error
+    await expect(this.powerOfAttorneyError).toBeVisible();
+}
+
+
+async TC_193_VerifyPowerOfAttorneyRejectsInvalidFormat(data) {
+
+    await this.navigateToPOI(data);
+
+    const path = require("path");
+
+    const invalidFilePath = path.join(
+        "D:/DSC",
+        String(data.powerOfAttorneyPath ?? "").trim()
+    );
+
+    await this.uploadPowerOfAttorney.setInputFiles(invalidFilePath);
+
+    // Verify invalid file format error
+    await expect(this.fileFormatError).toBeVisible();
+
+    // Clear uploaded file
+    await this.uploadPowerOfAttorney.setInputFiles([]);
+}
+
+async TC_194_VerifyPowerOfAttorneyAcceptsMaximum25MB(data) {
+
+    await this.navigateToPOI(data);
+
+    const fs = require("fs");
+    const path = require("path");
+
+    const maxSize = 25 * 1024 * 1024; // 25 MB
+
+    const files = [
+        path.join(
+            "D:/DSC",
+            String(data.powerOfAttorneypdfPath ?? "").trim()
+        ),
+        path.join("D:/DSC",String(data.powerOfAttorneyjpgPath ?? "").trim()),
+        path.join("D:/DSC",String(data.powerOfAttorneyjpegPath ?? "").trim()
+        )
+    ];
+
+    for (const filePath of files) {
+
+        // Verify file exists
+        expect(fs.existsSync(filePath)).toBeTruthy();
+
+        // Verify file size is exactly 25 MB
+        const fileSize = fs.statSync(filePath).size;
+        expect(fileSize).toBe(maxSize);
+
+        // Upload file
+        await this.uploadPowerOfAttorney.setInputFiles(filePath);
+
+        // Verify file is accepted
+        await expect(this.fileSizeError).not.toBeVisible();
+        await expect(this.fileSizeError1).not.toBeVisible();
+        await expect(this.fileFormatError).not.toBeVisible();
+
+        // Clear file before uploading next file
+        await this.uploadPowerOfAttorney.setInputFiles([]);
+    }
+}
+
+
+async TC_195_VerifyPowerOfAttorneyRejectsMoreThan25MB(data) {
+
+    await this.navigateToPOI(data);
+
+    const fs = require("fs");
+    const path = require("path");
+
+    const maxSize = 25 * 1024 * 1024; // 25 MB
+
+    const files = [
+        path.join(
+            "D:/DSC",String(data.powerOfAttorneypdfPath ?? "").trim()),
+        path.join("D:/DSC",String(data.powerOfAttorneyjpgPath ?? "").trim()),
+        path.join("D:/DSC",String(data.powerOfAttorneyjpegPath ?? "").trim())
+    ];
+
+    for (const filePath of files) {
+
+        // Verify file exists
+        expect(fs.existsSync(filePath)).toBeTruthy();
+
+        // Verify file size is greater than 25 MB
+        const fileSize = fs.statSync(filePath).size;
+        expect(fileSize).toBeGreaterThan(maxSize);
+
+        // Upload file
+        await this.uploadPowerOfAttorney.setInputFiles(filePath);
+
+        // Verify file size error
+        await expect(this.fileSizeError).toBeVisible();
+
+        // Clear file before next upload
+        await this.uploadPowerOfAttorney.setInputFiles([]);
+    }
+}
+
+async TC_196_VerifyPowerOfAttorneyAcceptsSameFormatFilesEqualTo25MB(data) {
+
+    await this.navigateToPOI(data);
+
+    const fs = require("fs");
+    const path = require("path");
+
+    const maxSize = 25 * 1024 * 1024; // 25 MB = 26214400 bytes
+
+    const files = [
+        path.join(
+            "D:/DSC",
+            String(data.powerOfAttorneypdfPath ?? "").trim()
+        ),
+        path.join(
+            "D:/DSC",
+            String(data.powerOfAttorneyjpgPath ?? "").trim()
+        ),
+        path.join(
+            "D:/DSC",
+            String(data.powerOfAttorneyjpegPath ?? "").trim()
+        )
+    ];
+
+    for (const filePath of files) {
+
+        // Verify file exists
+        expect(fs.existsSync(filePath)).toBeTruthy();
+
+        // Verify file size is exactly 25 MB
+        const fileSize = fs.statSync(filePath).size;
+        expect(fileSize).toBe(maxSize);
+
+        // Upload file
+        await this.uploadPowerOfAttorney.setInputFiles(filePath);
+
+        // Verify file is accepted
+        await expect(this.fileSizeError).not.toBeVisible();
+        await expect(this.fileFormatError).not.toBeVisible();
+
+        // Clear uploaded file before next upload
+        await this.uploadPowerOfAttorney.setInputFiles([]);
+    }
+}
+
+async TC_197_VerifyPowerOfAttorneyAcceptsSameFormatFilesLessThan25MB(data) {
+
+    await this.navigateToPOI(data);
+
+    const fs = require("fs");
+    const path = require("path");
+
+    const maxSize = 25 * 1024 * 1024; // 25 MB
+
+    const files = [
+        path.join("D:/DSC",String(data.powerOfAttorneypdfPath ?? "").trim()),
+        path.join("D:/DSC",String(data.powerOfAttorneyjpgPath ?? "").trim() ),
+        path.join("D:/DSC",String(data.powerOfAttorneyjpegPath ?? "").trim())
+    ];
+
+    for (const filePath of files) {
+
+        // Verify file exists
+        expect(fs.existsSync(filePath)).toBeTruthy();
+
+        // Verify file size is less than 25 MB
+        const fileSize = fs.statSync(filePath).size;
+        expect(fileSize).toBeLessThan(maxSize);
+
+        // Upload file
+        await this.uploadPowerOfAttorney.setInputFiles(filePath);
+
+        // Verify file is accepted
+        await expect(this.fileSizeError).not.toBeVisible();
+        await expect(this.fileFormatError).not.toBeVisible();
+
+        // Clear uploaded file before next upload
+        await this.uploadPowerOfAttorney.setInputFiles([]);
+    }
+}
+
+async TC_198_VerifyPowerOfAttorneyRejectsSameFormatFilesGreaterThan25MB(data) {
+
+    await this.navigateToPOI(data);
+
+    const fs = require("fs");
+    const path = require("path");
+
+    const maxSize = 25 * 1024 * 1024; // 25 MB
+
+    const files = [
+        path.join(
+            "D:/DSC",
+            String(data.powerOfAttorneypdfPath ?? "").trim()
+        ),
+        path.join(
+            "D:/DSC",
+            String(data.powerOfAttorneyjpgPath ?? "").trim()
+        ),
+        path.join(
+            "D:/DSC",
+            String(data.powerOfAttorneyjpegPath ?? "").trim()
+        )
+    ];
+
+    for (const filePath of files) {
+
+        // Verify file exists
+        expect(fs.existsSync(filePath)).toBeTruthy();
+
+        // Verify file size is greater than 25 MB
+        const fileSize = fs.statSync(filePath).size;
+        expect(fileSize).toBeGreaterThan(maxSize);
+
+        // Upload file
+        await this.uploadPowerOfAttorney.setInputFiles(filePath);
+
+        // Verify file size error is displayed
+        await expect(this.fileSizeError).toBeVisible();
+
+        // Clear uploaded file
+        await this.uploadPowerOfAttorney.setInputFiles([]);
+    }
+}
+
+async TC_199_VerifyPowerOfAttorneyRejectsInvalidFormatFilesEqualTo25MB(data) {
+
+    await this.navigateToPOI(data);
+
+    const fs = require("fs");
+    const path = require("path");
+
+    const maxSize = 25 * 1024 * 1024; // 25 MB
+
+    const filePath = path.join(
+        "D:/DSC",
+        String(data.powerOfAttorneyPath ?? "").trim()
+    );
+
+    // Verify file exists
+    expect(fs.existsSync(filePath)).toBeTruthy();
+
+    // Verify file size is exactly 25 MB
+    const fileSize = fs.statSync(filePath).size;
+    expect(fileSize).toBe(maxSize);
+
+    // Upload invalid-format file
+    await this.uploadPowerOfAttorney.setInputFiles(filePath);
+
+    // Verify invalid format error
+    await expect(this.fileFormatError).toBeVisible();
+
+    // Clear uploaded file
+    await this.uploadPowerOfAttorney.setInputFiles([]);
+}
+
+async TC_200_VerifyPowerOfAttorneyRejectsInvalidFormatFilesLessThan25MB(data) {
+
+    await this.navigateToPOI(data);
+
+    const fs = require("fs");
+    const path = require("path");
+
+    const maxSize = 25 * 1024 * 1024; // 25 MB
+
+    const filePath = path.join(
+        "D:/DSC",
+        String(data.powerOfAttorneyPath ?? "").trim()
+    );
+
+    // Verify file exists
+    expect(fs.existsSync(filePath)).toBeTruthy();
+
+    // Verify file size is less than 25 MB
+    const fileSize = fs.statSync(filePath).size;
+    expect(fileSize).toBeLessThan(maxSize);
+
+    // Upload invalid-format file
+    await this.uploadPowerOfAttorney.setInputFiles(filePath);
+
+    // Verify invalid format error
+    await expect(this.fileFormatError).toBeVisible();
+
+    // Clear uploaded file
+    await this.uploadPowerOfAttorney.setInputFiles([]);
+}
+
+async TC_201_VerifyPowerOfAttorneyRejectsInvalidFormatFilesGreaterThan25MB(data) {
+
+    await this.navigateToPOI(data);
+
+    const fs = require("fs");
+    const path = require("path");
+
+    const maxSize = 25 * 1024 * 1024; // 25 MB
+
+    const filePath = path.join(
+        "D:/DSC",
+        String(data.powerOfAttorneyPath ?? "").trim()
+    );
+
+    // Verify file exists
+    expect(fs.existsSync(filePath)).toBeTruthy();
+
+    // Verify file size is greater than 25 MB
+    const fileSize = fs.statSync(filePath).size;
+    expect(fileSize).toBeGreaterThan(maxSize);
+
+    // Upload invalid-format file
+    await this.uploadPowerOfAttorney.setInputFiles(filePath);
+
+    // Verify invalid format error
+    await expect(this.fileFormatError).toBeVisible();
+
+    // Clear uploaded file
+    await this.uploadPowerOfAttorney.setInputFiles([]);
+}
+
+async TC_202_VerifyOthersFieldIsNonMandatory(data) {
+
+    await this.navigateToPOI(data);
+
+    // Do not upload any file in Others field
+    await this.saveAndNextButton.click();
+
+    // Verify Others mandatory error is not displayed
+    await expect(this.othersError).not.toBeVisible();
+}
+
+async TC_203_VerifyOthersRejectsInvalidFormatFile(data) {
+
+    await this.navigateToPOI(data);
+
+    const path = require("path");
+
+    const filePath = path.join(
+        "D:/DSC",
+        String(data.othersFormatPath ?? "").trim()
+    );
+
+    // Upload invalid-format file
+    await this.uploadOthers.setInputFiles(filePath);
+
+    // Verify invalid format error
+    await expect(this.fileFormatError).toBeVisible();
+
+    // Clear uploaded file
+    await this.uploadOthers.setInputFiles([]);
+}
+
+async TC_204_VerifyOthersAcceptsFilesEqualTo25MB(data) {
+
+    await this.navigateToPOI(data);
+
+    const fs = require("fs");
+    const path = require("path");
+
+    const maxSize = 25 * 1024 * 1024; // 25 MB
+
+    const files = [
+        path.join("D:/DSC", String(data.othersPdfPath ?? "").trim()),
+        path.join("D:/DSC", String(data.othersJpgPath ?? "").trim()),
+        path.join("D:/DSC", String(data.othersJpegPath ?? "").trim())
+    ];
+
+    for (const filePath of files) {
+
+        // Verify file exists
+        expect(fs.existsSync(filePath)).toBeTruthy();
+
+        // Verify each file is exactly 25 MB
+        const fileSize = fs.statSync(filePath).size;
+        expect(fileSize).toBe(maxSize);
+
+        // Upload one file at a time
+        await this.uploadOthers.setInputFiles(filePath);
+
+        // Verify file is accepted
+        await expect(this.fileSizeError).not.toBeVisible();
+        await expect(this.fileFormatError).not.toBeVisible();
+
+        // Clear before next file
+        await this.uploadOthers.setInputFiles([]);
+    }
+}
+
+async TC_205_VerifyOthersRejectsFilesGreaterThan25MB(data) {
+
+    await this.navigateToPOI(data);
+
+    const fs = require("fs");
+    const path = require("path");
+
+    const maxSize = 25 * 1024 * 1024; // 25 MB
+
+    const files = [
+        path.join("D:/DSC", String(data.othersPdfPath ?? "").trim()),
+        path.join("D:/DSC", String(data.othersJpgPath ?? "").trim()),
+        path.join("D:/DSC", String(data.othersJpegPath ?? "").trim())
+    ];
+
+    for (const filePath of files) {
+
+        // Verify file exists
+        expect(fs.existsSync(filePath)).toBeTruthy();
+
+        // Verify file size is greater than 25 MB
+        const fileSize = fs.statSync(filePath).size;
+        expect(fileSize).toBeGreaterThan(maxSize);
+
+        // Upload one file at a time
+        await this.uploadOthers.setInputFiles(filePath);
+
+        // Verify file size error
+        await expect(this.fileSizeError).toBeVisible();
+
+        // Clear file before next upload
+        await this.uploadOthers.setInputFiles([]);
+    }
+}
+
+async TC_206_VerifyOthersAcceptsMultipleJpgFilesEqualTo25MB(data) {
+
+    await this.navigateToPOI(data);
+
+    const fs = require("fs");
+    const path = require("path");
+
+    const maxSize = 25 * 1024 * 1024; // 25 MB
+
+    const filePath = path.join(
+        "D:/DSC",
+        String(data.othersJpgPath ?? "").trim()
+    );
+
+    // Verify file exists
+    expect(fs.existsSync(filePath)).toBeTruthy();
+
+    // Verify JPG file size is exactly 25 MB
+    const fileSize = fs.statSync(filePath).size;
+    expect(fileSize).toBe(maxSize);
+
+    // Upload JPG file
+    await this.uploadOthers.setInputFiles(filePath);
+
+    // Verify file is accepted
+    await expect(this.fileSizeError).not.toBeVisible();
+    await expect(this.fileFormatError).not.toBeVisible();
+
+    // Clear file
+    await this.uploadOthers.setInputFiles([]);
+}
+
+async TC_207_VerifyOthersAcceptsMultipleJpgFilesLessThan25MB(data) {
+
+    await this.navigateToPOI(data);
+
+    const fs = require("fs");
+    const path = require("path");
+
+    const maxSize = 25 * 1024 * 1024; // 25 MB
+
+    const filePath = path.join(
+        "D:/DSC",
+        String(data.othersJpgPath ?? "").trim()
+    );
+
+    // Verify file exists
+    expect(fs.existsSync(filePath)).toBeTruthy();
+
+    // Verify JPG file size is less than 25 MB
+    const fileSize = fs.statSync(filePath).size;
+    expect(fileSize).toBeLessThan(maxSize);
+
+    // Upload JPG file
+    await this.uploadOthers.setInputFiles(filePath);
+
+    // Verify file is accepted
+    await expect(this.fileSizeError).not.toBeVisible();
+    await expect(this.fileFormatError).not.toBeVisible();
+
+    // Clear file before next upload
+    await this.uploadOthers.setInputFiles([]);
+}
+
+async TC_208_VerifyOthersRejectsMultipleJpgFilesGreaterThan25MB(data) {
+
+    await this.navigateToPOI(data);
+
+    const fs = require("fs");
+    const path = require("path");
+
+    const maxSize = 25 * 1024 * 1024; // 25 MB
+
+    const filePath = path.join(
+        "D:/DSC",
+        String(data.othersJpgPath ?? "").trim()
+    );
+
+    // Verify file exists
+    expect(fs.existsSync(filePath)).toBeTruthy();
+
+    // Verify JPG file size is greater than 25 MB
+    const fileSize = fs.statSync(filePath).size;
+    expect(fileSize).toBeGreaterThan(maxSize);
+
+    // Upload JPG file
+    await this.uploadOthers.setInputFiles(filePath);
+
+    // Verify file size error
+    await expect(this.fileSizeError).toBeVisible();
+
+    // Clear file before next upload
+    await this.uploadOthers.setInputFiles([]);
+}
+
+async TC_209_VerifyOthersRejectsInvalidFormatFileEqualTo25MB(data) {
+
+    await this.navigateToPOI(data);
+
+    const fs = require("fs");
+    const path = require("path");
+
+    const maxSize = 25 * 1024 * 1024; // 25 MB
+
+    const filePath = path.join(
+        "D:/DSC",
+        String(data.othersFormatPath ?? "").trim()
+    );
+
+    // Verify file exists
+    expect(fs.existsSync(filePath)).toBeTruthy();
+
+    // Verify file size is exactly 25 MB
+    const fileSize = fs.statSync(filePath).size;
+    expect(fileSize).toBe(maxSize);
+
+    // Upload invalid-format file
+    await this.uploadOthers.setInputFiles(filePath);
+
+    // Verify invalid format error
+    await expect(this.fileFormatError).toBeVisible();
+
+    // Clear uploaded file
+    await this.uploadOthers.setInputFiles([]);
+}
+
+async TC_210_VerifyOthersRejectsInvalidFormatFileLessThan25MB(data) {
+    await this.navigateToPOI(data);
+
+    const fs = require("fs");
+    const path = require("path");
+
+    const maxSize = 25 * 1024 * 1024;
+
+    const filePath = path.join(
+        "D:/DSC",
+        String(data.othersFormatPath ?? "").trim()
+    );
+
+    // Verify file exists
+    expect(fs.existsSync(filePath)).toBeTruthy();
+
+    // Verify it is a file, not a directory
+    expect(fs.statSync(filePath).isFile()).toBeTruthy();
+
+    // Verify file size is less than 25 MB
+    const fileSize = fs.statSync(filePath).size;
+    expect(fileSize).toBeLessThan(maxSize);
+
+    // Upload single invalid-format file
+    await this.uploadOthers.setInputFiles(filePath);
+
+    // Verify invalid format error
+    await expect(this.fileFormatError).toBeVisible();
+
+    // Clear file
+    await this.uploadOthers.setInputFiles([]);
+}
+
+
+async TC_211_VerifyOthersRejectsInvalidFormatFileGreaterThan25MB(data) {
+    await this.navigateToPOI(data);
+
+    const fs = require("fs");
+    const path = require("path");
+
+    const maxSize = 25 * 1024 * 1024;
+
+    const filePath = path.join(
+        "D:/DSC",
+        String(data.othersFormatPath ?? "").trim()
+    );
+
+    // Verify file exists
+    expect(fs.existsSync(filePath)).toBeTruthy();
+
+    // Verify it is a file, not a directory
+    expect(fs.statSync(filePath).isFile()).toBeTruthy();
+
+    // Verify file size is greater than 25 MB
+    const fileSize = fs.statSync(filePath).size;
+    expect(fileSize).toBeGreaterThan(maxSize);
+
+    // Upload single invalid-format file
+    await this.uploadOthers.setInputFiles(filePath);
+
+    // Verify invalid format error
+    await expect(this.fileFormatError).toBeVisible();
+
+    // Clear file
+    await this.uploadOthers.setInputFiles([]);
+}
+
+async TC_212_VerifySupportingDocumentsForPoIMandatory(data) {
+    await this.navigateToPOI(data);
+
+    // Do not upload any file in Supporting Documents for PoI
+
+    // Click Save And Next
+    await this.saveAndNextButton.click();
+
+    // Verify mandatory error message
+    await expect(
+        this.page.getByText(
+            "PoI supporting document is required",
+            { exact: true }
+        )
+    ).toBeVisible();
+}
+
+async TC_213_VerifySupportingDocumentsForPoIAcceptsOnlyValidFormats(data) {
+    await this.navigateToPOI(data);
+
+    const fs = require("fs");
+    const path = require("path");
+
+    const filePath = path.join(
+        "D:/DSC",
+        String(data.supportingDocumentsForPoiFormatPath ?? "").trim()
+    );
+
+    // Verify file exists
+    expect(fs.existsSync(filePath)).toBeTruthy();
+
+    // Verify it is a file, not a directory
+    expect(fs.statSync(filePath).isFile()).toBeTruthy();
+
+    // Upload invalid-format file
+    await this.uploadSupportingDocumentsForPoI.setInputFiles(filePath);
+
+    // Verify invalid format error
+    await expect(this.fileFormatError).toBeVisible();
+
+    // Clear file
+    await this.uploadSupportingDocumentsForPoI.setInputFiles([]);
+}
+
+async TC_214_VerifySupportingDocumentsForPoIAcceptsMaximum25MB(data) {
+    await this.navigateToPOI(data);
+
+    const fs = require("fs");
+    const path = require("path");
+
+    const maxSize = 25 * 1024 * 1024;
+
+    // PDF file
+    const pdfPath = path.join(
+        "D:/DSC",
+        String(data.supportingDocumentsForPoiPdfPath ?? "").trim()
+    );
+
+    expect(fs.existsSync(pdfPath)).toBeTruthy();
+    expect(fs.statSync(pdfPath).isFile()).toBeTruthy();
+
+    const pdfSize = fs.statSync(pdfPath).size;
+    expect(pdfSize).toBe(maxSize);
+
+    await this.uploadSupportingDocumentsForPoI.setInputFiles(pdfPath);
+
+    // Verify no file size error
+    await expect(this.fileSizeError).not.toBeVisible();
+
+    // Clear file
+    await this.uploadSupportingDocumentsForPoI.setInputFiles([]);
+
+
+    // JPG file
+    const jpgPath = path.join(
+        "D:/DSC",
+        String(data.supportingDocumentsForPoiJpgPath ?? "").trim()
+    );
+
+    expect(fs.existsSync(jpgPath)).toBeTruthy();
+    expect(fs.statSync(jpgPath).isFile()).toBeTruthy();
+
+    const jpgSize = fs.statSync(jpgPath).size;
+    expect(jpgSize).toBe(maxSize);
+
+    await this.uploadSupportingDocumentsForPoI.setInputFiles(jpgPath);
+
+    // Verify no file size error
+    await expect(this.fileSizeError).not.toBeVisible();
+
+    // Clear file
+    await this.uploadSupportingDocumentsForPoI.setInputFiles([]);
+
+
+    // JPEG file
+    const jpegPath = path.join(
+        "D:/DSC",
+        String(data.supportingDocumentsForPoiJpegPath ?? "").trim()
+    );
+
+    expect(fs.existsSync(jpegPath)).toBeTruthy();
+    expect(fs.statSync(jpegPath).isFile()).toBeTruthy();
+
+    const jpegSize = fs.statSync(jpegPath).size;
+    expect(jpegSize).toBe(maxSize);
+
+    await this.uploadSupportingDocumentsForPoI.setInputFiles(jpegPath);
+
+    // Verify no file size error
+    await expect(this.fileSizeError).not.toBeVisible();
+
+    // Clear file
+    await this.uploadSupportingDocumentsForPoI.setInputFiles([]);
+}
+
+async TC_215_VerifySupportingDocumentsForPoIRejectsMoreThan25MB(data) {
+    await this.navigateToPOI(data);
+
+    const path = require("path");
+
+    // PDF
+    const pdfPath = path.join(
+        "D:/DSC",
+        String(data.supportingDocumentsForPoiPdfPath ?? "").trim()
+    );
+
+    await this.uploadSupportingDocumentsForPoI.setInputFiles(pdfPath);
+
+    await expect(this.fileSizeError).toBeVisible();
+
+    await this.uploadSupportingDocumentsForPoI.setInputFiles([]);
+
+
+    // JPG
+    const jpgPath = path.join(
+        "D:/DSC",
+        String(data.supportingDocumentsForPoiJpgPath ?? "").trim()
+    );
+
+    await this.uploadSupportingDocumentsForPoI.setInputFiles(jpgPath);
+
+    await expect(this.fileSizeError).toBeVisible();
+
+    await this.uploadSupportingDocumentsForPoI.setInputFiles([]);
+
+
+    // JPEG
+    const jpegPath = path.join(
+        "D:/DSC",
+        String(data.supportingDocumentsForPoiJpegPath ?? "").trim()
+    );
+
+    await this.uploadSupportingDocumentsForPoI.setInputFiles(jpegPath);
+
+    await expect(this.fileSizeError).toBeVisible();
+
+    await this.uploadSupportingDocumentsForPoI.setInputFiles([]);
+}
+
+async TC_216_VerifyTrustSupportingDocumentsForPoIAccepts25MBJPEG(data) {
+    await this.navigateToPOI(data);
+
+    const path = require("path");
+
+    const jpegPath = path.join(
+        "D:/DSC",
+        String(data.supportingDocumentsForPoiJpegPath ?? "").trim()
+    );
+
+    // Upload 25 MB JPEG file
+    await this.uploadSupportingDocumentsForPoI.setInputFiles(jpegPath);
+
+    // Verify file size error is not displayed
+    await expect(this.fileSizeError).not.toBeVisible();
+
+    // Verify format error is not displayed
+    await expect(this.fileFormatError).not.toBeVisible();
+
+    // Clear file
+    await this.uploadSupportingDocumentsForPoI.setInputFiles([]);
+}
+
+async TC_217_VerifyTrustSupportingDocumentsForPoIAcceptsJPEGLessThan25MB(data) {
+    await this.navigateToPOI(data);
+
+    const path = require("path");
+
+    const jpegPath = path.join(
+        "D:/DSC",
+        String(data.supportingDocumentsForPoiJpegPath ?? "").trim()
+    );
+
+    // Upload JPEG file less than 25 MB
+    await this.uploadSupportingDocumentsForPoI.setInputFiles(jpegPath);
+
+    // Verify no file size error
+    await expect(this.fileSizeError).not.toBeVisible();
+
+    // Verify no file format error
+    await expect(this.fileFormatError).not.toBeVisible();
+
+    // Clear file
+    await this.uploadSupportingDocumentsForPoI.setInputFiles([]);
+}
+
+async TC_218_VerifyTrustSupportingDocumentsForPoIRejectsJPEGGreaterThan25MB(data) {
+    await this.navigateToPOI(data);
+
+    const path = require("path");
+
+    const jpegPath = path.join(
+        "D:/DSC",
+        String(data.supportingDocumentsForPoiJpegPath ?? "").trim()
+    );
+
+    // Upload JPEG file greater than 25 MB
+    await this.uploadSupportingDocumentsForPoI.setInputFiles(jpegPath);
+
+    // Verify file size error message
+    await expect(this.fileSizeError).toBeVisible();
+
+    // Clear file
+    await this.uploadSupportingDocumentsForPoI.setInputFiles([]);
+}
+
+async TC_219_VerifyTrustSupportingDocumentsForPoIAcceptsJPG25MB(data) {
+    await this.navigateToPOI(data);
+
+    const path = require("path");
+
+    const jpgPath = path.join(
+        "D:/DSC",
+        String(data.supportingDocumentsForPoiJpgPath ?? "").trim()
+    );
+
+    // Upload JPG file exactly 25 MB
+    await this.uploadSupportingDocumentsForPoI.setInputFiles(jpgPath);
+
+    // Verify no file size error
+    await expect(this.fileSizeError).not.toBeVisible();
+
+    // Verify no file format error
+    await expect(this.fileFormatError).not.toBeVisible();
+
+    // Clear file
+    await this.uploadSupportingDocumentsForPoI.setInputFiles([]);
+}
+
+async TC_220_VerifyTrustSupportingDocumentsForPoIAcceptsJPGLessThan25MB(data) {
+    await this.navigateToPOI(data);
+
+    const path = require("path");
+
+    const jpgPath = path.join(
+        "D:/DSC",
+        String(data.supportingDocumentsForPoiJpgPath ?? "").trim()
+    );
+
+    // Upload JPG file less than 25 MB
+    await this.uploadSupportingDocumentsForPoI.setInputFiles(jpgPath);
+
+    // Verify no file size error
+    await expect(this.fileSizeError).not.toBeVisible();
+
+    // Verify no file format error
+    await expect(this.fileFormatError).not.toBeVisible();
+
+    // Clear file
+    await this.uploadSupportingDocumentsForPoI.setInputFiles([]);
+}
+
+async TC_221_VerifyTrustSupportingDocumentsForPoIRejectsJPGGreaterThan25MB(data) {
+    await this.navigateToPOI(data);
+
+    const path = require("path");
+
+    const jpgPath = path.join(
+        "D:/DSC",
+        String(data.supportingDocumentsForPoiJpgPath ?? "").trim()
+    );
+
+    // Upload JPG file greater than 25 MB
+    await this.uploadSupportingDocumentsForPoI.setInputFiles(jpgPath);
+
+    // Verify file size error message
+    await expect(this.fileSizeError).toBeVisible();
+
+    // Clear file
+    await this.uploadSupportingDocumentsForPoI.setInputFiles([]);
+}
+
+async TC_222_VerifyRegistrationCertificateIsNonMandatoryForOtherConstitutionTypes(data) {
+    await this.navigateToPOI(data);
+
+
+    await this.saveAndNextButton.click();
+
+    // Verify Registration Certificate mandatory error is not displayed
+    await expect(this.page.getByText("Registration Certificate is required",{ exact: true })).not.toBeVisible();
+}
+
+async TC_223_VerifyRegistrationCertificateAcceptsOnlyValidFormats(data) {
+    await this.navigateToPOI(data);
+
+    const path = require("path");
+
+    const filePath = path.join(
+        "D:/DSC",
+        String(data.registrationCertificateInvalidPath ?? "").trim()
+    );
+
+    // Upload invalid format file
+    await this.uploadRegistrationCertificate.setInputFiles(filePath);
+
+    // Verify invalid format error message
+    await expect(this.fileFormatError).toBeVisible();
+
+    // Clear file
+    await this.uploadRegistrationCertificate.setInputFiles([]);
+}
+
+async TC_224_VerifyRegistrationCertificateAcceptsMaximum25MB(data) {
+   await this.navigateToPOI(data);
+
+    const path = require("path");
+ // PDF
+    const pdfPath = path.join("D:/DSC",String(data.registrationCertificatePdfPath ?? "").trim());
+
+    await this.uploadRegistrationCertificate.setInputFiles(pdfPath);
+
+    await expect(this.fileSizeError).not.toBeVisible();
+    await expect(this.fileFormatError).not.toBeVisible();
+
+    await this.uploadRegistrationCertificate.setInputFiles([]);
+
+
+    // JPG
+    const jpgPath = path.join("D:/DSC",String(data.registrationCertificateJpgPath ?? "").trim());
+
+    await this.uploadRegistrationCertificate.setInputFiles(jpgPath);
+
+    await expect(this.fileSizeError).not.toBeVisible();
+    await expect(this.fileFormatError).not.toBeVisible();
+
+    await this.uploadRegistrationCertificate.setInputFiles([]);
+
+
+    // JPEG
+    const jpegPath = path.join("D:/DSC",String(data.registrationCertificateJpegPath ?? "").trim());
+
+    await this.uploadRegistrationCertificate.setInputFiles(jpegPath);
+
+    await expect(this.fileSizeError).not.toBeVisible();
+    await expect(this.fileFormatError).not.toBeVisible();
+
+    await this.uploadRegistrationCertificate.setInputFiles([]);
+}
+
+async TC_225_VerifyRegistrationCertificateRejectsMoreThan25MB(data) {
+   await this.navigateToPOI(data);
+
+    const path = require("path");
+
+    // PDF
+    const pdfPath = path.join(
+        "D:/DSC",
+        String(data.registrationCertificatePdfPath ?? "").trim()
+    );
+
+    await this.uploadRegistrationCertificate.setInputFiles(pdfPath);
+
+    await expect(this.fileSizeError).toBeVisible();
+
+    await this.uploadRegistrationCertificate.setInputFiles([]);
+
+
+    // JPG
+    const jpgPath = path.join(
+        "D:/DSC",
+        String(data.registrationCertificateJpgPath ?? "").trim()
+    );
+
+    await this.uploadRegistrationCertificate.setInputFiles(jpgPath);
+
+    await expect(this.fileSizeError).toBeVisible();
+
+    await this.uploadRegistrationCertificate.setInputFiles([]);
+
+
+    // JPEG
+    const jpegPath = path.join(
+        "D:/DSC",
+        String(data.registrationCertificateJpegPath ?? "").trim()
+    );
+
+    await this.uploadRegistrationCertificate.setInputFiles(jpegPath);
+
+    await expect(this.fileSizeError).toBeVisible();
+
+    await this.uploadRegistrationCertificate.setInputFiles([]);
+}
+
+async TC_226_VerifyRegistrationCertificateAccepts25MBJPEGForOtherConstitutionTypes(data) {
+
+    await this.navigateToPOI(data);
+
+const path = require("path");
+
+// Upload 25 MB JPEG file
+const jpegPath = path.join("D:/DSC",String(data.registrationCertificateJpegPath ?? "").trim());
+
+await this.uploadRegistrationCertificate.setInputFiles(jpegPath);
+
+// Verify 25 MB JPEG is accepted
+await expect(this.fileSizeError).not.toBeVisible();
+await expect(this.fileFormatError).not.toBeVisible();
+
+// Clear uploaded file
+await this.uploadRegistrationCertificate.setInputFiles([]);
+
+
+}
+
+async TC_227_VerifyRegistrationCertificateAcceptsJPEGLessThan25MBForOtherConstitutionTypes(data) {
+
+    await this.navigateToPOI(data);
+
+    const path = require("path");
+
+    const jpegPath = path.join(
+        "D:/DSC",
+        String(data.registrationCertificateJpegPath ?? "").trim()
+    );
+
+    await this.uploadRegistrationCertificate.setInputFiles(jpegPath);
+
+    await expect(this.fileSizeError).not.toBeVisible();
+    await expect(this.fileFormatError).not.toBeVisible();
+
+    await this.uploadRegistrationCertificate.setInputFiles([]);
+}
+
+async TC_228_VerifyRegistrationCertificateRejectsJPEGGreaterThan25MBForOtherConstitutionTypes(data) {
+
+    await this.navigateToPOI(data);
+
+    const path = require("path");
+
+    const jpegPath = path.join(
+        "D:/DSC",
+        String(data.registrationCertificateJpegPath ?? "").trim()
+    );
+
+    await this.uploadRegistrationCertificate.setInputFiles(jpegPath);
+
+    await expect(this.fileSizeError).toBeVisible();
+
+    await this.uploadRegistrationCertificate.setInputFiles([]);
+}
+
+async TC_229_VerifyRegistrationCertificateAcceptsJPGEqualTo25MBForOtherConstitutionTypes(data) {
+
+    await this.navigateToPOI(data);
+
+    const path = require("path");
+
+    const jpgPath = path.join(
+        "D:/DSC",
+        String(data.registrationCertificateJpgPath ?? "").trim()
+    );
+
+    await this.uploadRegistrationCertificate.setInputFiles(jpgPath);
+
+    await expect(this.fileSizeError).not.toBeVisible();
+    await expect(this.fileFormatError).not.toBeVisible();
+
+    await this.uploadRegistrationCertificate.setInputFiles([]);
+}
+
+async TC_230_VerifyRegistrationCertificateAcceptsJPGLessThan25MBForOtherConstitutionTypes(data) {
+
+    await this.navigateToPOI(data);
+
+    const path = require("path");
+
+    const jpgPath = path.join("D:/DSC",String(data.registrationCertificateJpgPath ?? "").trim());
+
+    await this.uploadRegistrationCertificate.setInputFiles(jpgPath);
+
+    await expect(this.fileSizeError).not.toBeVisible();
+    await expect(this.fileFormatError).not.toBeVisible();
+
+    await this.uploadRegistrationCertificate.setInputFiles([]);
+}
+
+async TC_231_VerifyRegistrationCertificateRejectsJPGGreaterThan25MBForOtherConstitutionTypes(data) {
+
+    await this.navigateToPOI(data);
+
+    const path = require("path");
+
+    const jpgPath = path.join("D:/DSC",String(data.registrationCertificateJpgPath ?? "").trim());
+
+    await this.uploadRegistrationCertificate.setInputFiles(jpgPath);
+
+    await expect(this.fileSizeError).toBeVisible();
+
+    await this.uploadRegistrationCertificate.setInputFiles([]);
+}
+
+async TC_232_VerifyPowerOfAttorneyIsNonMandatoryForOtherConstitutionTypes(data) {
+
+    await this.navigateToPOI(data);
+
+    // Do not upload any file in Power of Attorney field
+
+    await this.saveAndNextButton.click();
+
+    await expect(this.page.getByText("Power of Attorney is required",{ exact: true })).not.toBeVisible();
+}
+
+async TC_233_VerifyPowerOfAttorneyAcceptsOnlyValidFormats(data) {
+
+    await this.navigateToPOI(data);
+
+    const path = require("path");
+
+    const filePath = path.join(
+        "D:/DSC",
+        String(data.powerOfAttorneyPath ?? "").trim()
+    );
+
+    await this.uploadPowerOfAttorney1.setInputFiles(filePath);
+
+    await expect(this.fileFormatError).toBeVisible();
+
+    await this.uploadPowerOfAttorney1.setInputFiles([]);
+}
+
+async TC_234_VerifyPowerOfAttorneyAcceptsMaximum25MB(data) {
+
+    await this.navigateToPOI(data);
+
+    const path = require("path");
+
+    const pdfPath = path.join("D:/DSC",String(data.powerOfAttorneypdfPath ?? "").trim());
+
+    await this.uploadPowerOfAttorney1.setInputFiles(pdfPath);
+
+    await expect(this.fileSizeError).not.toBeVisible();
+    await expect(this.fileFormatError).not.toBeVisible();
+
+    await this.uploadPowerOfAttorney1.setInputFiles([]);
+
+    const jpgPath = path.join("D:/DSC",String(data.powerOfAttorneyjpgPath ?? "").trim() );
+
+    await this.uploadPowerOfAttorney1.setInputFiles(jpgPath);
+
+    await expect(this.fileSizeError).not.toBeVisible();
+    await expect(this.fileFormatError).not.toBeVisible();
+
+    await this.uploadPowerOfAttorney1.setInputFiles([]);
+
+    const jpegPath = path.join("D:/DSC",String(data.powerOfAttorneyjpegPath ?? "").trim());
+
+    await this.uploadPowerOfAttorney1.setInputFiles(jpegPath);
+
+    await expect(this.fileSizeError).not.toBeVisible();
+    await expect(this.fileFormatError).not.toBeVisible()
+
+    await this.uploadPowerOfAttorney1.setInputFiles([]);
+}
+
+async TC_235_VerifyPowerOfAttorneyRejectsMoreThan25MB(data) {
+
+    await this.navigateToPOI(data);
+
+    const path = require("path");
+
+    // PDF > 25 MB
+    const pdfPath = path.join(
+        "D:/DSC",
+        String(data.powerOfAttorneypdfPath ?? "").trim()
+    );
+
+    await this.uploadPowerOfAttorney1.setInputFiles(pdfPath);
+
+    await expect(this.fileSizeError).toBeVisible();
+
+    await this.uploadPowerOfAttorney1.setInputFiles([]);
+
+    // JPG > 25 MB
+    const jpgPath = path.join("D:/DSC",String(data.powerOfAttorneyjpgPath ?? "").trim());
+
+    await this.uploadPowerOfAttorney1.setInputFiles(jpgPath);
+
+    await expect(this.fileSizeError).toBeVisible();
+
+    await this.uploadPowerOfAttorney1.setInputFiles([]);
+
+    // JPEG > 25 MB
+    const jpegPath = path.join(
+        "D:/DSC",
+        String(data.powerOfAttorneyjpegPath ?? "").trim()
+    );
+
+    await this.uploadPowerOfAttorney1.setInputFiles(jpegPath);
+
+    await expect(this.fileSizeError).toBeVisible();
+
+    await this.uploadPowerOfAttorney1.setInputFiles([]);
+}
+
+async TC_236_VerifyPowerOfAttorneyAccepts25MBJPEGForOtherConstitutionTypes(data) {
+
+    await this.navigateToPOI(data);
+
+    const path = require("path");
+
+    const jpegPath = path.join("D:/DSC",String(data.powerOfAttorneyjpegPath ?? "").trim());
+
+    await this.uploadPowerOfAttorney1.setInputFiles(jpegPath);
+
+    // Verify 25 MB JPEG is accepted
+    await expect(this.fileSizeError).not.toBeVisible();
+    await expect(this.fileFormatError).not.toBeVisible();
+
+    // Clear uploaded file
+    await this.uploadPowerOfAttorney1.setInputFiles([]);
+}
+
+async TC_237_VerifyPowerOfAttorneyAcceptsJPEGLessThan25MBForOtherConstitutionTypes(data) {
+
+    await this.navigateToPOI(data);
+
+    const path = require("path");
+
+    const jpegPath = path.join("D:/DSC",String(data.powerOfAttorneyjpegPath ?? "").trim());
+
+    // Upload JPEG file less than 25 MB
+    await this.uploadPowerOfAttorney1.setInputFiles(jpegPath);
+
+    // Verify file is accepted
+    await expect(this.fileSizeError).not.toBeVisible();
+    await expect(this.fileFormatError).not.toBeVisible();
+
+    // Clear uploaded file
+    await this.uploadPowerOfAttorney1.setInputFiles([]);
+}
+
+async TC_238_VerifyPowerOfAttorneyRejectsJPEGGreaterThan25MBForOtherConstitutionTypes(data) {
+
+    await this.navigateToPOI(data);
+
+    const path = require("path");
+
+    const jpegPath = path.join("D:/DSC",String(data.powerOfAttorneyjpegPath ?? "").trim());
+
+    // Upload JPEG file greater than 25 MB
+    await this.uploadPowerOfAttorney1.setInputFiles(jpegPath);
+
+    // Verify file is rejected
+    await expect(this.fileSizeError).toBeVisible();
+
+    // Clear uploaded file
+    await this.uploadPowerOfAttorney1.setInputFiles([]);
+}
+
+async TC_239_VerifyPowerOfAttorneyAcceptsJPGEqualTo25MBForOtherConstitutionTypes(data) {
+
+    await this.navigateToPOI(data);
+
+    const path = require("path");
+
+    const jpgPath = path.join("D:/DSC",String(data.powerOfAttorneyjpgPath ?? "").trim() );
+
+    // Upload JPG file equal to 25 MB
+    await this.uploadPowerOfAttorney1.setInputFiles(jpgPath);
+
+    // Verify file is accepted
+    await expect(this.fileSizeError).not.toBeVisible();
+    await expect(this.fileFormatError).not.toBeVisible();
+
+    // Clear uploaded file
+    await this.uploadPowerOfAttorney1.setInputFiles([]);
+}
+
+async TC_240_VerifyPowerOfAttorneyAcceptsJPGLessThan25MBForOtherConstitutionTypes(data) {
+
+    await this.navigateToPOI(data);
+
+    const path = require("path");
+
+    const jpgPath = path.join(
+        "D:/DSC",
+        String(data.powerOfAttorneyjpgPath ?? "").trim()
+    );
+
+    // Upload JPG file less than 25 MB
+    await this.uploadPowerOfAttorney1.setInputFiles(jpgPath);
+
+    // Verify file is accepted
+    await expect(this.fileSizeError).not.toBeVisible();
+    await expect(this.fileFormatError).not.toBeVisible();
+
+    // Clear uploaded file
+    await this.uploadPowerOfAttorney1.setInputFiles([]);
+}
+
+async TC_241_VerifyPowerOfAttorneyRejectsJPGGreaterThan25MBForOtherConstitutionTypes(data) {
+
+    await this.navigateToPOI(data);
+
+    const path = require("path");
+
+    const jpgPath = path.join("D:/DSC",String(data.powerOfAttorneyjpgPath ?? "").trim());
+
+    // Upload JPG file greater than 25 MB
+    await this.uploadPowerOfAttorney1.setInputFiles(jpgPath);
+
+    // Verify file is rejected
+    await expect(this.fileSizeError).toBeVisible();
+
+    // Clear uploaded file
+    await this.uploadPowerOfAttorney1.setInputFiles([]);
+}
+
+async TC_242_VerifyOthersFieldIsNonMandatoryForOtherConstitutionTypes(data) {
+
+    await this.navigateToPOI(data);
+
+    // Do not upload any file in Others field
+
+    // Click Save & Next
+    await this.saveAndNextButton.click();
+
+    // Verify Others mandatory error is not displayed
+    await expect(
+        this.page.getByText("Others is required", { exact: true })
+    ).not.toBeVisible();
+}
+
+async TC_243_VerifyOthersFieldAcceptsOnlyValidFormats(data) {
+
+    await this.navigateToPOI(data);
+
+    const path = require("path");
+
+    const filePath = path.join(
+        "D:/DSC",
+        String(data.othersFormatPath ?? "").trim()
+    );
+
+    // Upload invalid file format
+    await this.uploadOthers.setInputFiles(filePath);
+
+    // Verify invalid format error
+    await expect(this.fileFormatError).toBeVisible();
+
+    // Clear uploaded file
+    await this.uploadOthers.setInputFiles([]);
+}
+
+async TC_244_VerifyOthersFieldAcceptsMaximum25MB(data) {
+
+    await this.navigateToPOI(data);
+
+    const path = require("path");
+
+    // PDF - 25 MB
+    const pdfPath = path.join("D:/DSC",String(data.othersPdfPath ?? "").trim());
+
+    await this.uploadOthers.setInputFiles(pdfPath);
+    await expect(this.fileSizeError).not.toBeVisible();
+    await expect(this.fileFormatError).not.toBeVisible();
+    await this.uploadOthers.setInputFiles([]);
+
+    // JPG - 25 MB
+    const jpgPath = path.join("D:/DSC",String(data.othersJpgPath ?? "").trim());
+
+    await this.uploadOthers.setInputFiles(jpgPath);
+    await expect(this.fileSizeError).not.toBeVisible();
+    await expect(this.fileFormatError).not.toBeVisible();
+    await this.uploadOthers.setInputFiles([]);
+
+    // JPEG - 25 MB
+    const jpegPath = path.join("D:/DSC",String(data.othersJpegPath ?? "").trim());
+
+    await this.uploadOthers.setInputFiles(jpegPath);
+    await expect(this.fileSizeError).not.toBeVisible();
+    await expect(this.fileFormatError).not.toBeVisible();
+    await this.uploadOthers.setInputFiles([]);
+}
+
+async TC_245_VerifyOthersFieldRejectsMoreThan25MB(data) {
+
+    await this.navigateToPOI(data);
+
+    const path = require("path");
+
+    // PDF greater than 25 MB
+    const pdfPath = path.join(
+        "D:/DSC",
+        String(data.othersPdfPath ?? "").trim()
+    );
+
+    await this.uploadOthers.setInputFiles(pdfPath);
+    await expect(this.fileSizeError).toBeVisible();
+    await this.uploadOthers.setInputFiles([]);
+
+    // JPG greater than 25 MB
+    const jpgPath = path.join(
+        "D:/DSC",
+        String(data.othersJpgPath ?? "").trim()
+    );
+
+    await this.uploadOthers.setInputFiles(jpgPath);
+    await expect(this.fileSizeError).toBeVisible();
+    await this.uploadOthers.setInputFiles([]);
+
+    // JPEG greater than 25 MB
+    const jpegPath = path.join("D:/DSC",String(data.othersJpegPath ?? "").trim());
+
+    await this.uploadOthers.setInputFiles(jpegPath);
+    await expect(this.fileSizeError).toBeVisible();
+    await this.uploadOthers.setInputFiles([]);
+}
+
+async TC_246_VerifyOthersFieldAcceptsJPEGEqualTo25MBForOtherConstitutionTypes(data) {
+
+    await this.navigateToPOI(data);
+
+    const path = require("path");
+
+    const jpegPath = path.join(
+        "D:/DSC",
+        String(data.othersJpegPath ?? "").trim()
+    );
+
+    // Upload JPEG file equal to 25 MB
+    await this.uploadOthers.setInputFiles(jpegPath);
+
+    // Verify file is accepted
+    await expect(this.fileSizeError).not.toBeVisible();
+    await expect(this.fileFormatError).not.toBeVisible();
+
+    // Clear uploaded file
+    await this.uploadOthers.setInputFiles([]);
+}
+
+async TC_247_VerifyOthersFieldAcceptsJPEGLessThan25MBForOtherConstitutionTypes(data) {
+
+    await this.navigateToPOI(data);
+
+    const path = require("path");
+
+    const jpegPath = path.join(
+        "D:/DSC",
+        String(data.othersJpegPath ?? "").trim()
+    );
+
+    // Upload JPEG file less than 25 MB
+    await this.uploadOthers.setInputFiles(jpegPath);
+
+    // Verify file is accepted
+    await expect(this.fileSizeError).not.toBeVisible();
+    await expect(this.fileFormatError).not.toBeVisible();
+
+    // Clear uploaded file
+    await this.uploadOthers.setInputFiles([]);
+}
+
+async TC_248_VerifyOthersFieldRejectsJPEGGreaterThan25MBForOtherConstitutionTypes(data) {
+
+    await this.navigateToPOI(data);
+
+    const path = require("path");
+
+    const jpegPath = path.join(
+        "D:/DSC",
+        String(data.othersJpegPath ?? "").trim()
+    );
+
+    // Upload JPEG file greater than 25 MB
+    await this.uploadOthers.setInputFiles(jpegPath);
+
+    // Verify file is rejected
+    await expect(this.fileSizeError).toBeVisible();
+
+    // Clear uploaded file
+    await this.uploadOthers.setInputFiles([]);
+}
+
+async TC_249_VerifyOthersFieldAcceptsJPGEqualTo25MBForOtherConstitutionTypes(data) { 
+ 
+    await this.navigateToPOI(data); 
+ 
+    const path = require("path"); 
+ 
+    const jpgPath = path.join( 
+        "D:/DSC", 
+        String(data.othersJpgPath ?? "").trim() 
+    ); 
+ 
+    // Upload JPG file equal to 25 MB 
+    await this.uploadOthers.setInputFiles(jpgPath); 
+ 
+    // Verify file is accepted 
+    await expect(this.fileSizeError).not.toBeVisible(); 
+ 
+    // Clear uploaded file 
+    await this.uploadOthers.setInputFiles([]); 
+}
+
+async TC_250_VerifyOthersFieldAcceptsJPGLessThan25MBForOtherConstitutionTypes(data) { 
+ 
+    await this.navigateToPOI(data); 
+ 
+    const path = require("path"); 
+ 
+    const jpgPath = path.join( 
+        "D:/DSC", 
+        String(data.othersJpgPath ?? "").trim() 
+    ); 
+ 
+    // Upload JPG file less than 25 MB 
+    await this.uploadOthers.setInputFiles(jpgPath); 
+ 
+    // Verify file is accepted 
+    await expect(this.fileSizeError).not.toBeVisible(); 
+ 
+    // Clear uploaded file 
+    await this.uploadOthers.setInputFiles([]); 
+}
+
+async TC_251_VerifyOthersFieldRejectsJPGGreaterThan25MBForOtherConstitutionTypes(data) { 
+ 
+    await this.navigateToPOI(data); 
+ 
+    const path = require("path"); 
+ 
+    const jpgPath = path.join( 
+        "D:/DSC", 
+        String(data.othersJpgPath ?? "").trim() 
+    ); 
+ 
+    // Upload JPG file greater than 25 MB 
+    await this.uploadOthers.setInputFiles(jpgPath); 
+ 
+    // Verify file is rejected 
+    await expect(this.fileSizeError).toBeVisible(); 
+ 
+    // Clear uploaded file 
+    await this.uploadOthers.setInputFiles([]); 
+}
+
+async TC_252_VerifySaveAndNextFunctionalityForPrefetchedPOIAddressDetails(data) {
+
+    await this.kycManagementDropdown.click();
+    await this.singleOperationsDropdown.click();
+    await this.page.getByText('Create-Draft').click();
+    await this.page.getByRole('radio', {name: 'Legal Entity'}).check();
+
+    await this.page.getByRole('textbox', { name : 'Enter Search Key' }).fill(data.SearchKey);
+    await this.page.locator('button').filter({hasText: 'Search'}).first().click();
+    await this.page.getByText(data.SearchKey, {exact : true}).click();
+
+    for(let i=0;i<1;i++){
+        await this.page.waitForTimeout(2000);
+        await this.saveAndNextButton.click();
+    }
+
+    await this.page.screenshot({
+    path: `AllScreenshots_POIAddress/${data.testCaseId}.png`,
+    fullPage: true});
+
+
+  await expect(this.cin).not.toHaveValue('');
+
+    // Verify user can resume the process
+    await this.saveAndNextButton.click();
+
+    // Verify navigation to next section
+    await expect(this.nextSectionHeading).toBeVisible();
+}
+
+async TC_253_VerifySaveAndNextSavesModifiedPOIData(data) {
+
+    await this.navigateToPOI(data);
+
+    await this.page.screenshot({
+    path: `AllScreenshots_PoiDetails/${data.testCaseId}.png`,
+    fullPage: true
+});
+
+    // Modify CIN
+    await this.cin.fill(String(data.cin ?? '').trim());
+
+    await this.page.screenshot({
+    path: `AllScreenshots_PoiDetails/${data.testCaseId}.png`,
+    fullPage: true
+});
+
+    // Click Save And Next
+    await this.saveAndNextButton.click();
+
+    // Verify navigation to Address Details
+    await expect(this.nextSectionHeading).toBeVisible({
+        timeout: 60000
+    });
+}
+
+async TC_254_VerifyREUserCanSavePOIAddressDetailsAndResumeProcess(data) {
+
+    await this.kycManagementDropdown.click();
+    await this.singleOperationsDropdown.click();
+    await this.page.getByText('Create-Draft').click();
+    await this.page.getByRole('radio', { name: 'Legal Entity' }).check();
+
+    await this.page.getByRole('textbox', {
+        name: 'Enter Search Key'
+    }).fill(data.SearchKey);
+
+    await this.page.locator('button')
+        .filter({ hasText: 'Search' })
+        .first()
+        .click();
+
+    await this.page.getByText(data.SearchKey, {
+        exact: true
+    }).click();
+
+    for (let i = 0; i < 1; i++) {
+        await this.page.waitForTimeout(2000);
+        await this.saveAndNextButton.click();
+    }
+
+    // Verify saved POI & Address details are retained
+    await expect(this.cin).not.toHaveValue('');
+
+    await this.page.screenshot({
+    path: `AllScreenshots_POIAddress/${data.testCaseId}.png`,
+    fullPage: true
+});
+
+// Modify CIN
+    await this.cin.fill(String(data.cin ?? '').trim());
+
+
+    // Verify user can resume the process
+    await this.saveAndNextButton.click();
+
+    // Verify navigation to next section
+    await expect(this.nextSectionHeading).toBeVisible();
+}
+
     }
 module.exports = { PoiDetails };

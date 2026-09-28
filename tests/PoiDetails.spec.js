@@ -104,6 +104,10 @@ await login.login(
 
 switch (data.TC_Num) {
 
+  case 'TC_CPOIALE_01':
+        await poiDetails.TC_01_VerifyNavigationToProofOfIdentityAndAddress(data);
+        break;
+
     case 'TC_CPOIALE_02':
         await poiDetails.TC_02_POI_VerifyAllFields(data);
         break;
@@ -318,7 +322,7 @@ switch (data.TC_Num) {
         await poiDetails.TC_54_CPOIALE_VerifySeniorManagementAcceptsJPEGLessThan25MB(data);
         break;
 
-        TC_55_CPOIALE_VerifySeniorManagementRejectsJPEGGreaterThan25MB
+       
 
 
         case 'TC_CPOIALE_55':
@@ -553,7 +557,23 @@ switch (data.TC_Num) {
         case 'TC_CPOIALE_112':
         await poiDetails.TC_112_VerifyPartnershipDeedAcceptsPDFJPGJPEGLessThan25MB(data);
         break;
+        
+        case 'TC_CPOIALE_113':
+        await poiDetails.TC_113_VerifyPartnershipDeedRejectsOtherFormatGreaterThan25MB(data);
+        break;
 
+        case 'TC_CPOIALE_114':
+        await poiDetails.TC_114_VerifyPartnershipDeedRejectsOtherFormatEqualTo25MB(data);
+        break;
+
+        
+        case 'TC_CPOIALE_115':
+        await poiDetails.TC_115_VerifyPartnershipDeedRejectsOtherFormatLessThan25MB(data);
+        break;
+
+        case 'TC_CPOIALE_116':
+        await poiDetails.TC_116_VerifyPartnershipDeedRejectsOtherFormatGreaterThan25MB(data);
+        break;
         
         case 'TC_CPOIALE_117':
         await poiDetails.TC_117_VerifyNamesOfAllPartnersMandatoryForPartnershipFirm(data);
@@ -725,6 +745,408 @@ switch (data.TC_Num) {
         case 'TC_CPOIALE_158':
         await poiDetails.TC_158_VerifyTrustDeedRejectsMultipleFilesGreaterThan25MB(data);
         break;
+
+        case 'TC_CPOIALE_159':
+        await poiDetails.TC_159_VerifyTrustDeedRejectsInvalidFormatFileEqualTo25MB(data);
+        break;
+
+        case 'TC_CPOIALE_160':
+        await poiDetails.TC_160_VerifyTrustDeedRejectsMultipleInvalidFormatFilesLessThan25MB(data);
+        break;
+
+        case 'TC_CPOIALE_161':
+        await poiDetails.TC_161_VerifyTrustDeedRejectsInvalidFormatFileGreaterThan25MB(data);
+        break;
+
+        case 'TC_CPOIALE_162':
+        await poiDetails.TC_162_VerifyNamesOfBeneficiariesTrusteesSettlorAuthorsFieldIsMandatoryForRegisteredTrust(data);
+        break;
+
+        
+        case 'TC_CPOIALE_163':
+        await poiDetails.TC_163_VerifyNamesOfBeneficiariesTrusteesSettlorAuthorsAcceptsOnlyPDFJPGJPEG(data);
+        break;
+
+        case 'TC_CPOIALE_164':
+        await poiDetails.TC_164_VerifyNamesOfBeneficiariesTrusteesSettlorAuthorsAcceptsMaximum25MBAcrossAllFormats(data);
+        break;
+
+        
+        case 'TC_CPOIALE_165':
+        await poiDetails.TC_165_VerifyNamesOfBeneficiariesTrusteesSettlorAuthorsRejectsFilesGreaterThan25MB(data);
+        break;
+
+                
+        case 'TC_CPOIALE_166':
+        await poiDetails.TC_166_VerifyNamesBeneficiariesAcceptsPDFJPGJPEGEqualTo25MB(data);
+        break;
+
+        case 'TC_CPOIALE_167':
+        await poiDetails.TC_167_VerifyNamesBeneficiariesAcceptsMultipleSameFormatFilesLessThan25MB(data);
+        break;
+
+        case 'TC_CPOIALE_168':
+        await poiDetails.TC_168_VerifyNamesBeneficiariesRejectsMultipleSameFormatFilesGreaterThan25MB(data);
+        break;
+
+        case 'TC_CPOIALE_169':
+        await poiDetails.TC_169_VerifyNamesBeneficiariesRejectsMultipleInvalidFormatFilesEqualTo25MB(data);
+        break;
+
+        case 'TC_CPOIALE_170':
+        await poiDetails.TC_170_VerifyNamesBeneficiariesRejectsMultipleInvalidFormatFilesLessThan25MB(data);
+        break;
+
+         case 'TC_CPOIALE_171':
+        await poiDetails.TC_171_VerifyNamesBeneficiariesRejectsMultipleInvalidFormatFilesGreaterThan25MB(data);
+        break;
+
+        
+         case 'TC_CPOIALE_172':
+        await poiDetails.TC_172_VerifyOthersFieldIsNonMandatoryForTrust(data);
+        break;
+
+        case 'TC_CPOIALE_173':
+        await poiDetails.TC_173_VerifyOthersFieldRejectOtherThanPDFJPGJPEG(data);
+        break;
+
+        case 'TC_CPOIALE_174':
+        await poiDetails.TC_174_VerifyOthersFieldAccepts25MBAllFormats(data);
+        break;
+
+        case 'TC_CPOIALE_175':
+        await poiDetails.TC_175_VerifyOthersFieldRejectsMoreThan25MB(data);
+        break;
+
+        case 'TC_CPOIALE_176':
+        await poiDetails.TC_176_VerifyOthersFieldForTrustAccepts25MBJPEG(data);
+        break;
+        
+        case 'TC_CPOIALE_177':
+        await poiDetails.TC_177_VerifyOthersFieldForTrustAcceptsJPEGLessThan25MB(data);
+        break;
+
+         case 'TC_CPOIALE_178':
+        await poiDetails.TC_178_VerifyOthersFieldForTrustRejectsJPEGGreaterThan25MB(data);
+        break;
+
+        case 'TC_CPOIALE_179':
+        await poiDetails.TC_179_VerifyOthersFieldForTrustAcceptsJPGEqualTo25MB(data);
+        break;
+
+        case 'TC_CPOIALE_180':
+        await poiDetails.TC_180_VerifyOthersFieldForTrustAcceptsJPGLessThan25MB(data);
+        break;
+
+        
+        case 'TC_CPOIALE_181':
+        await poiDetails.TC_181_VerifyOthersFieldForTrustRejectsJPGGreaterThan25MB(data);
+        break;
+
+        case 'TC_CPOIALE_182':
+        await poiDetails.TC_182_VerifyResolutionOfManagingBodyFieldIsMandatory(data);
+        break;
+
+         case 'TC_CPOIALE_183':
+        await poiDetails.TC_183_VerifyResolutionOfManagingBodyRejectsInvalidFormat(data);
+        break;
+
+        case 'TC_CPOIALE_184':
+        await poiDetails.TC_184_VerifyResolutionOfManagingBodyAcceptsMaximum25MB(data);
+        break;
+
+        case 'TC_CPOIALE_185':
+        await poiDetails.TC_185_VerifyResolutionOfManagingBodyRejectsMoreThan25MB(data);
+        break;
+
+        case 'TC_CPOIALE_186':
+        await poiDetails.TC_186_VerifyResolutionOfManagingBodyAccepts25MBPDF(data);
+        break;
+
+        case 'TC_CPOIALE_187':
+        await poiDetails.TC_187_VerifyResolutionOfManagingBodyAcceptsPDFLessThan25MB(data);
+        break;
+
+        case 'TC_CPOIALE_188':
+        await poiDetails.TC_188_VerifyResolutionOfManagingBodyRejectsJPGAndJPEGGreaterThan25MB(data);
+        break;
+
+        case 'TC_CPOIALE_189':
+        await poiDetails.TC_189_VerifyResolutionOfManagingBodyRejectsInvalidFormatsEqualTo25MB(data);
+        break;
+
+        
+        case 'TC_CPOIALE_190':
+        await poiDetails.TC_190_VerifyResolutionOfManagingBodyRejectsInvalidFormatsLessThan25MB(data);
+        break;
+
+        case 'TC_CPOIALE_191':
+        await poiDetails.TC_191_VerifyResolutionOfManagingBodyRejectsInvalidFormatsGreaterThan25MB(data);
+        break;
+
+        case 'TC_CPOIALE_192':
+        await poiDetails.TC_192_VerifyPowerOfAttorneyFieldIsMandatory(data);
+        break;
+
+        case 'TC_CPOIALE_193':
+        await poiDetails.TC_193_VerifyPowerOfAttorneyRejectsInvalidFormat(data);
+        break;
+
+        case 'TC_CPOIALE_194':
+        await poiDetails.TC_194_VerifyPowerOfAttorneyAcceptsMaximum25MB(data);
+        break;
+
+          case 'TC_CPOIALE_195':
+        await poiDetails.TC_195_VerifyPowerOfAttorneyRejectsMoreThan25MB(data);
+        break;
+
+        case 'TC_CPOIALE_196':
+        await poiDetails.TC_196_VerifyPowerOfAttorneyAcceptsSameFormatFilesEqualTo25MB(data);
+        break;
+
+        case 'TC_CPOIALE_197':
+        await poiDetails.TC_197_VerifyPowerOfAttorneyAcceptsSameFormatFilesLessThan25MB(data);
+        break;
+
+        case 'TC_CPOIALE_198':
+        await poiDetails.TC_198_VerifyPowerOfAttorneyRejectsSameFormatFilesGreaterThan25MB(data);
+        break;
+
+        case 'TC_CPOIALE_199':
+        await poiDetails.TC_199_VerifyPowerOfAttorneyRejectsInvalidFormatFilesEqualTo25MB(data);
+        break;
+
+        case 'TC_CPOIALE_200':
+        await poiDetails.TC_200_VerifyPowerOfAttorneyRejectsInvalidFormatFilesLessThan25MB(data);
+        break;
+
+        case 'TC_CPOIALE_201':
+        await poiDetails.TC_201_VerifyPowerOfAttorneyRejectsInvalidFormatFilesGreaterThan25MB(data);
+        break;
+
+         case 'TC_CPOIALE_202':
+        await poiDetails.TC_202_VerifyOthersFieldIsNonMandatory(data);
+        break;
+        
+        case 'TC_CPOIALE_203':
+        await poiDetails.TC_203_VerifyOthersRejectsInvalidFormatFile(data);
+        break;
+
+        case 'TC_CPOIALE_204':
+        await poiDetails.TC_204_VerifyOthersAcceptsFilesEqualTo25MB(data);
+        break;
+
+        case 'TC_CPOIALE_205':
+        await poiDetails.TC_205_VerifyOthersRejectsFilesGreaterThan25MB(data);
+        break;
+        
+        
+        case 'TC_CPOIALE_206':
+        await poiDetails.TC_206_VerifyOthersAcceptsMultipleJpgFilesEqualTo25MB(data);
+        break;
+
+        case 'TC_CPOIALE_207':
+        await poiDetails.TC_207_VerifyOthersAcceptsMultipleJpgFilesLessThan25MB(data);
+        break;
+
+        case 'TC_CPOIALE_208':
+        await poiDetails.TC_208_VerifyOthersRejectsMultipleJpgFilesGreaterThan25MB(data);
+        break;
+
+        case 'TC_CPOIALE_209':
+        await poiDetails.TC_209_VerifyOthersRejectsInvalidFormatFileEqualTo25MB(data);
+        break;
+
+        case 'TC_CPOIALE_210':
+        await poiDetails.TC_210_VerifyOthersRejectsInvalidFormatFileLessThan25MB(data);
+        break;
+
+        case 'TC_CPOIALE_211':
+        await poiDetails.TC_211_VerifyOthersRejectsInvalidFormatFileGreaterThan25MB(data);
+        break;
+
+        case 'TC_CPOIALE_212':
+        await poiDetails.TC_212_VerifySupportingDocumentsForPoIMandatory(data);
+        break;
+
+        case 'TC_CPOIALE_213':
+        await poiDetails.TC_213_VerifySupportingDocumentsForPoIAcceptsOnlyValidFormats(data);
+        break;
+
+        case 'TC_CPOIALE_214':
+        await poiDetails.TC_214_VerifySupportingDocumentsForPoIAcceptsMaximum25MB(data);
+        break;
+
+        case 'TC_CPOIALE_214':
+        await poiDetails.TC_215_VerifySupportingDocumentsForPoIRejectsMoreThan25MB(data);
+        break;
+        
+        case 'TC_CPOIALE_215':
+        await poiDetails.TC_215_VerifySupportingDocumentsForPoIRejectsMoreThan25MB(data);
+        break;
+
+        case 'TC_CPOIALE_216':
+        await poiDetails.TC_216_VerifyTrustSupportingDocumentsForPoIAccepts25MBJPEG(data);
+        break;
+
+        case 'TC_CPOIALE_217':
+        await poiDetails.TC_217_VerifyTrustSupportingDocumentsForPoIAcceptsJPEGLessThan25MB(data);
+        break;
+
+        case 'TC_CPOIALE_218':
+        await poiDetails.TC_218_VerifyTrustSupportingDocumentsForPoIRejectsJPEGGreaterThan25MB(data);
+        break;
+
+        case 'TC_CPOIALE_219':
+        await poiDetails.TC_219_VerifyTrustSupportingDocumentsForPoIAcceptsJPG25MB(data);
+        break;
+
+        case 'TC_CPOIALE_220':
+        await poiDetails.TC_220_VerifyTrustSupportingDocumentsForPoIAcceptsJPGLessThan25MB(data);
+        break;
+
+        case 'TC_CPOIALE_221':
+        await poiDetails.TC_221_VerifyTrustSupportingDocumentsForPoIRejectsJPGGreaterThan25MB(data);
+        break;
+        
+        case 'TC_CPOIALE_221':
+        await poiDetails.TC_221_VerifyTrustSupportingDocumentsForPoIRejectsJPGGreaterThan25MB(data);
+        break;
+
+        case 'TC_CPOIALE_222':
+        await poiDetails.TC_222_VerifyRegistrationCertificateIsNonMandatoryForOtherConstitutionTypes(data);
+        break;
+
+        case 'TC_CPOIALE_223':
+        await poiDetails.TC_223_VerifyRegistrationCertificateAcceptsOnlyValidFormats(data);
+        break;
+
+        case 'TC_CPOIALE_224':
+        await poiDetails.TC_224_VerifyRegistrationCertificateAcceptsMaximum25MB(data);
+        break;
+
+        case 'TC_CPOIALE_225':
+        await poiDetails.TC_225_VerifyRegistrationCertificateRejectsMoreThan25MB(data);
+        break;
+
+        case 'TC_CPOIALE_226':
+        await poiDetails.TC_226_VerifyRegistrationCertificateAccepts25MBJPEGForOtherConstitutionTypes(data);
+        break;
+ 
+        case 'TC_CPOIALE_227':
+        await poiDetails.TC_227_VerifyRegistrationCertificateAcceptsJPEGLessThan25MBForOtherConstitutionTypes(data);
+        break;
+
+        case 'TC_CPOIALE_228':
+        await poiDetails.TC_228_VerifyRegistrationCertificateRejectsJPEGGreaterThan25MBForOtherConstitutionTypes(data);
+        break;
+
+         case 'TC_CPOIALE_229':
+        await poiDetails.TC_229_VerifyRegistrationCertificateAcceptsJPGEqualTo25MBForOtherConstitutionTypes(data);
+        break;
+
+        case 'TC_CPOIALE_230':
+        await poiDetails.TC_230_VerifyRegistrationCertificateAcceptsJPGLessThan25MBForOtherConstitutionTypes(data);
+        break;
+
+        case 'TC_CPOIALE_231':
+        await poiDetails.TC_231_VerifyRegistrationCertificateRejectsJPGGreaterThan25MBForOtherConstitutionTypes(data);
+        break;
+
+        case 'TC_CPOIALE_232':
+        await poiDetails.TC_232_VerifyPowerOfAttorneyIsNonMandatoryForOtherConstitutionTypes(data);
+        break;
+
+        case 'TC_CPOIALE_233':
+        await poiDetails.TC_233_VerifyPowerOfAttorneyAcceptsOnlyValidFormats(data);
+        break;
+
+        
+        case 'TC_CPOIALE_234':
+        await poiDetails.TC_234_VerifyPowerOfAttorneyAcceptsMaximum25MB(data);
+        break;
+
+        case 'TC_CPOIALE_235':
+        await poiDetails.TC_235_VerifyPowerOfAttorneyRejectsMoreThan25MB(data);
+        break;
+
+        case 'TC_CPOIALE_236':
+        await poiDetails.TC_236_VerifyPowerOfAttorneyAccepts25MBJPEGForOtherConstitutionTypes(data);
+        break;
+
+        case 'TC_CPOIALE_237':
+        await poiDetails.TC_237_VerifyPowerOfAttorneyAcceptsJPEGLessThan25MBForOtherConstitutionTypes(data);
+        break;
+
+        case 'TC_CPOIALE_238':
+        await poiDetails.TC_238_VerifyPowerOfAttorneyRejectsJPEGGreaterThan25MBForOtherConstitutionTypes(data);
+        break;
+
+        case 'TC_CPOIALE_239':
+        await poiDetails.TC_239_VerifyPowerOfAttorneyAcceptsJPGEqualTo25MBForOtherConstitutionTypes(data);
+        break;
+
+        case 'TC_CPOIALE_240':
+        await poiDetails.TC_240_VerifyPowerOfAttorneyAcceptsJPGLessThan25MBForOtherConstitutionTypes(data);
+        break;
+
+        case 'TC_CPOIALE_241':
+        await poiDetails.TC_241_VerifyPowerOfAttorneyRejectsJPGGreaterThan25MBForOtherConstitutionTypes(data);
+        break;
+
+        case 'TC_CPOIALE_242':
+        await poiDetails.TC_242_VerifyOthersFieldIsNonMandatoryForOtherConstitutionTypes(data);
+        break;
+
+        case 'TC_CPOIALE_243':
+        await poiDetails.TC_243_VerifyOthersFieldAcceptsOnlyValidFormats(data);
+        break;
+
+        case 'TC_CPOIALE_244':
+        await poiDetails.TC_244_VerifyOthersFieldAcceptsMaximum25MB(data);
+        break;
+
+        case 'TC_CPOIALE_245':
+        await poiDetails.TC_245_VerifyOthersFieldRejectsMoreThan25MB(data);
+        break;
+
+        case 'TC_CPOIALE_246':
+        await poiDetails.TC_246_VerifyOthersFieldAcceptsJPEGEqualTo25MBForOtherConstitutionTypes(data);
+        break;
+        
+        case 'TC_CPOIALE_247':
+        await poiDetails.TC_247_VerifyOthersFieldAcceptsJPEGLessThan25MBForOtherConstitutionTypes(data);
+        break;
+
+        case 'TC_CPOIALE_248':
+        await poiDetails.TC_248_VerifyOthersFieldRejectsJPEGGreaterThan25MBForOtherConstitutionTypes(data);
+        break;
+
+        case 'TC_CPOIALE_249':
+        await poiDetails.TC_249_VerifyOthersFieldAcceptsJPGEqualTo25MBForOtherConstitutionTypes(data);
+        break;
+
+        case 'TC_CPOIALE_250':
+        await poiDetails.TC_250_VerifyOthersFieldAcceptsJPGLessThan25MBForOtherConstitutionTypes(data);
+        break;
+
+        case 'TC_CPOIALE_251':
+        await poiDetails.TC_251_VerifyOthersFieldRejectsJPGGreaterThan25MBForOtherConstitutionTypes(data);
+        break;
+
+        case 'TC_CPOIALE_252':
+        await poiDetails.TC_252_VerifySaveAndNextFunctionalityForPrefetchedPOIAddressDetails(data);
+        break;
+
+        case 'TC_CPOIALE_253':
+        await poiDetails.TC_253_VerifySaveAndNextSavesModifiedPOIData(data);
+        break;
+
+          case 'TC_CPOIALE_254':
+        await poiDetails.TC_254_VerifyREUserCanSavePOIAddressDetailsAndResumeProcess(data);
+        break;
+
+
 
     default:
         throw new Error(
